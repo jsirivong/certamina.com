@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import type { RegisterData, User } from "./auth.types.ts";
 import sql from "../../config/database.ts";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
-import { hashPassword } from "../../services.ts/hashpassword.ts";
+import { hashPassword } from "../../services/hashpassword.ts";
 
 const validateEmailFormat = (email: string): boolean => {
     const emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
