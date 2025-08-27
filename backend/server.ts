@@ -3,13 +3,21 @@ import dotenv from 'dotenv'
 import cors from 'cors';
 import morgan from 'morgan'
 import auth from './routes/auth.route.ts';
+import room from './routes/room.route.ts'
+import email from './routes/email.route.ts'
+import practice from './routes/practice.route.ts';
 import sql from './config/database.ts';
 import cookieparser from 'cookie-parser'
+import { createServer } from 'http';
+import { initializeSocketIOServer } from './sockets/socket.ts';
+import { Server } from 'socket.io';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+
+const server = createServer(app);
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -19,6 +27,9 @@ app.use(cookieparser());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/v1/auth", auth)
+app.use("/api/v1/room", room)
+app.use("/api/v1/email", email)
+app.use("/api/v1/practice", practice)
 
 const initializeUsersDatabase = async () => {
     try {
@@ -38,8 +49,16 @@ const initializeUsersDatabase = async () => {
     }
 }
 
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
+})
+
 initializeUsersDatabase().then(() => {
-    app.listen(PORT, () => {
+    initializeSocketIOServer(io);
+
+    server.listen(PORT, () => {
         console.log(`Server running on localhost:${PORT}\nServer listening to port ${PORT}`);
     }).on("error", (err) => {
         console.log("Error starting server.", err);
