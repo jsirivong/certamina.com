@@ -4,11 +4,7 @@ export interface RegisterData {
     password: string;
 }
 
-export interface User {
-    id: number;
+export interface LoginData {
     email: string;
-    username: string;
     password: string;
-    created_at?: Date;
-    updated_at?: Date;
 }

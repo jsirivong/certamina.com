@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
-import type { RegisterData, User } from "./auth.types.ts";
+import type { LoginData, RegisterData } from "./auth.types.ts";
+import type User from "../../types/User.ts";
 import sql from "../../config/database.ts";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
-import { hashPassword } from "../../services/hashpassword.ts";
+import { hashPassword, comparePassword } from "../../services/password.ts";
 
 const validateEmailFormat = (email: string): boolean => {
     const emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -28,6 +29,45 @@ const verifyUsernameUniqueness = async (username: string): Promise<boolean> => {
     }
 
     return true;
+}
+
+export const login = async (req: Request, res: Response) => {
+    try {
+        const { email, password }: LoginData = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Please provide all credentials." });
+        }
+
+        const [user] = await sql`SELECT * FROM users WHERE email=${email};` as User[];
+
+        if (!user) { return res.status(404).json({ success: false, message: "Email does not exist." }) }
+
+        if (!comparePassword(password, user.password)) return res.status(404).json({ success: false, message: "Password does not match." });
+
+        const payload: JwtPayload = {
+            sub: user.id.toString()
+        }
+
+        const options: jwt.SignOptions = {
+            // automatically adds "iat" and "exp" claims in payload
+            expiresIn: "1d"
+        }
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
+
+        res.cookie("token", token, {
+            secure: true,
+            httpOnly: false, // only in development, true for production
+            maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
+            sameSite: "strict" // stops XSS attacks (cross-site scripting)
+        })
+
+        res.status(201).json({ success: true, user: user })
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Internal server error." });
+        console.log("Error in login controller.\n", err);
+    }
 }
 
 export const register = async (req: Request, res: Response) => {
@@ -70,15 +110,15 @@ export const register = async (req: Request, res: Response) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
 
         res.cookie("token", token, {
-            secure: true, 
+            secure: true,
             httpOnly: false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
             sameSite: "strict" // stops XSS attacks (cross-site scripting)
         })
 
-        res.status(201).json({ success: true, user: user })
+        return res.status(201).json({success: true, user: user})
     } catch (err) {
-        res.status(500).json({ success: false, message: "Internal server error." })
         console.error("Error in auth controller.\n", err);
+        return res.status(500).json({ success: false, message: "Internal server error." })
     }
 }
