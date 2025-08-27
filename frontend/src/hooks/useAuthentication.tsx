@@ -1,12 +1,10 @@
 import { useState } from "react";
 import type User from "../types/User";
 import axios from "../services/axios.ts";
-import { useNavigate } from "react-router";
 
 export default function useAuthentication() {
     const [loading, setLoading] = useState<boolean>(false);
     const [user, setUser] = useState<User>()
-    const navigate = useNavigate();
 
     const checkAuthentication = async () => {
         setLoading(true);

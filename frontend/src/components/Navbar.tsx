@@ -1,27 +1,24 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useLocation } from "react-router";
-import axios from "../services/axios";
-import { useState } from "react";
 
 interface IProps {
     children: React.ReactNode;
 }
 
 export default function Navbar({ children }: IProps) {
-    const [error, setError] = useState<null | string>(null);
     const location = useLocation();
     const pathname = location.pathname;
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        try {
-            navigate("/login")
+    // const handleLogout = async () => {
+    //     try {
+    //         navigate("/login")
 
-            await axios.post("/auth/logout");
-        } catch (err: any) {
-            setError(err.response.data?.message);
-        }
-    }
+    //         await axios.post("/auth/logout");
+    //     } catch (err: any) {
+    //         setError(err.response.data?.message);
+    //     }
+    // }
 
     return (
         <>

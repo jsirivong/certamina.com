@@ -1,9 +1,7 @@
 import { useState, type FormEvent } from "react";
-import Navbar from "../components/Navbar";
 import axios from "../services/axios";
 import { useNavigate } from "react-router";
-import io from 'socket.io-client';
-import { joinRoom } from "../sockets/emitters/roomEmitters";
+// import io from 'socket.io-client';
 import useAuthentication from "../hooks/useAuthentication";
 
 export default function Join() {
@@ -27,7 +25,6 @@ export default function Join() {
                     navigate(`/room/${response.data.code}`)
                     setCode("");
                     setError(null);
-                    joinRoom({ username: user?.username, id: user?.id }, response.data.code)
                 }
             }
         } catch (err: any) {

@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import axios from "../services/axios.ts";
-import useAuthentication from "../hooks/useAuthentication.tsx";
 
 interface RegisterData {
     username: string;

@@ -33,6 +33,7 @@ export default function Contact(){
             }
         } catch (err: any) {
             setError(err.response.data?.message);
+            console.log(error);
         } finally {
             setLoading(false);
         }

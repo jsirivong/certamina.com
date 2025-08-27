@@ -3,7 +3,7 @@ interface IProps {
     profile_picture?: string;
 }
 
-export default function PlayerCard({username, profile_picture}: IProps ){
+export default function PlayerCard({username}: IProps ){
     return (
         <div className="bg-base-100 shadow-sm w-full max-h-15 rounded-2xl">
             <div className="flex flex-row space-x-4 items-center">

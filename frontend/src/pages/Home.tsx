@@ -1,7 +1,7 @@
 export default function Home(){
     return (
-        <div>
-
+        <div className="h-screen overflow-y-auto" data-theme="light">
+            
         </div>
     )
 }
