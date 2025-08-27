@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import type { LoginData, RegisterData } from "./auth.types.ts";
 import type User from "../../types/User.ts";
-import sql from "../../config/database.ts";
+import { sql } from "../../lib/database.ts";
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { hashPassword, comparePassword } from "../../services/password.ts";
 
