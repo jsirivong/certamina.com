@@ -5,7 +5,7 @@
   "main": "backend/server.ts",
   "scripts": {
     "dev": "nodemon backend/server.ts",
-    "build": "node server.ts"
+    "build": "node backend/server.ts"
   },
   "keywords": [],
   "author": "",
