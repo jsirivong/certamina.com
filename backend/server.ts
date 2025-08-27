@@ -6,7 +6,7 @@ import auth from './routes/auth.route.ts';
 import room from './routes/room.route.ts'
 // import email from './routes/email.route.ts'
 import practice from './routes/practice.route.ts';
-import sql from './config/database.ts';
+import { sql } from "./lib/database.ts"
 import cookieparser from 'cookie-parser'
 import { createServer } from 'http';
 import { initializeSocketIOServer } from './sockets/socket.ts';
@@ -51,7 +51,7 @@ const initializeUsersDatabase = async () => {
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173"
+        origin: "https://certamina.com"
     }
 })
 
