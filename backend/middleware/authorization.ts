@@ -1,6 +1,6 @@
-import { type Request, type Response, type NextFunction } from 'express';
+import { type Response, type NextFunction } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
-import sql from '../config/database.ts';
+import { sql } from '../lib/database.ts';
 import type User from '../types/User.ts';
 import type AuthorizedUserRequest from '../types/AuthorizedUserRequest.ts';
 
