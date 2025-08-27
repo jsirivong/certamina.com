@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import axios from "../services/axios.ts";
-import { useNavigate } from "react-router";
+import useAuthentication from "../hooks/useAuthentication.tsx";
 
 interface RegisterData {
     username: string;
@@ -9,7 +9,6 @@ interface RegisterData {
 }
 
 export default function Register() {
-    const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
     const [registerData, setRegisterData] = useState<RegisterData>({
@@ -26,7 +25,6 @@ export default function Register() {
             const response = await axios.post("/auth/register", registerData)
 
             if (response.data.message === "success") {
-                navigate("/");
                 setError(null);
             }
         } catch (err: any) {
@@ -40,19 +38,19 @@ export default function Register() {
     return (
         <div className="h-screen flex justify-center" data-theme="light">
             <div className="max-w-screen bg-base-100 w-full p-10 lg:flex lg:flex-row">
-                <div className="max-w-[50vw] w-full">
+                <div className="max-w-[100vh] lg:max-w-[50vw] w-full">
                     <div className="p-6">
                         <h1 className="font-semibold text-4xl text-center">Register</h1>
                     </div>
 
                     {error && (
-                        <div className="error">
-                            {error}
+                        <div className="alert alert-warning my-5">
+                            <span className="">{error}</span>
                         </div>
                     )}
 
                     <form className="space-y-10" onSubmit={handleSubmit}>
-                        <div className="max-w-sm space-y-4">
+                        <div className="max-w-lg space-y-4 mx-auto">
                             <div className="flex flex-col">
                                 <label className="label">
                                     <span className="label-text mb-2 font-semibold">Username</span>
