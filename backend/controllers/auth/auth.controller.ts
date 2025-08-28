@@ -60,7 +60,8 @@ export const login = async (req: Request, res: Response) => {
             secure: true,
             httpOnly: process.env.NODE_ENV === "production" ? true : false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict" // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // stops XSS attacks (cross-site scripting)
+            domain: process.env.NODE_ENV === "production" ? "certamina.com" : "localhost"
         })
 
         res.status(201).json({ success: true, user: user })
@@ -109,13 +110,12 @@ export const register = async (req: Request, res: Response) => {
 
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
 
-        console.log(process.env.NODE_ENV, process.env.NODE_ENV === "production")
-
         res.cookie("token", token, {
             secure: true,
             httpOnly: process.env.NODE_ENV === "production" ? true : false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict" // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // stops XSS attacks (cross-site scripting)
+            domain: process.env.NODE_ENV === "production" ? "certamina.com" : "localhost"
         })
 
         return res.status(201).json({success: true, user: user})
