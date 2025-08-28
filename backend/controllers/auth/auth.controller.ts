@@ -55,10 +55,11 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
+        console.log("hi")
 
         res.cookie("token", token, {
-            secure: true,
-            httpOnly: false, // only in development, true for production
+            secure: true ? process.env.NODE_ENV==="production" : false,
+            httpOnly: true ? process.env.NODE_ENV === "production" : false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
             sameSite: "strict" // stops XSS attacks (cross-site scripting)
         })
@@ -110,8 +111,8 @@ export const register = async (req: Request, res: Response) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
 
         res.cookie("token", token, {
-            secure: true,
-            httpOnly: false, // only in development, true for production
+            secure: true ? process.env.NODE_ENV === "production" : false,
+            httpOnly: true ? process.env.NODE_ENV === "production" : false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
             sameSite: "strict" // stops XSS attacks (cross-site scripting)
         })
