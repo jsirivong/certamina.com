@@ -20,7 +20,7 @@ const PORT = process.env.PORT;
 const server = createServer(app);
 
 app.use(cors({
-    origin: "https://certamina.com",
+    origin: ["https://certamina.com", "http://localhost:5173"],
     credentials: true
 }));
 app.use(cookieparser());
@@ -49,9 +49,9 @@ const initializeUsersDatabase = async () => {
     }
 }
 
-const io = new Server(server, {
+const io = new Server(server, { 
     cors: {
-        origin: "https://certamina.com"
+        origin: ["https://certamina.com", "http://localhost:5173"]
     }
 })
 
