@@ -1,8 +1,8 @@
 import a from 'axios';
 
 const axios = a.create({
-    baseURL: import.meta.env.PROD ? "https://certamina-com.onrender.com/api/v1" : "http://localhost:3000/api/v1",
+    baseURL: `${import.meta.env.PROD ? import.meta.env.VITE_PROD_API_URL : import.meta.env.VITE_DEV_API_URL}/api/v1`,
     withCredentials: true
-})
+});
 
-export default axios;
+export default axios
