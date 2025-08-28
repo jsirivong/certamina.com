@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import axios from "../services/axios.ts";
+import { useNavigate } from "react-router";
 
 interface RegisterData {
     username: string;
@@ -8,6 +9,7 @@ interface RegisterData {
 }
 
 export default function Register() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
     const [registerData, setRegisterData] = useState<RegisterData>({
@@ -23,7 +25,8 @@ export default function Register() {
         try {
             const response = await axios.post("/auth/register", registerData)
 
-            if (response.data.message === "success") {
+            if (response.data.success) {
+                navigate("/");
                 setError(null);
             }
         } catch (err: any) {
