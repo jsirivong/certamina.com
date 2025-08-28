@@ -1,6 +1,10 @@
+import { useThemeStore } from "../store/useThemeStore"
+
 export default function About(){
+    const { theme } = useThemeStore();
+    
     return (
-        <div className="h-screen overflow-y-auto" data-theme="light">
+        <div className="h-screen overflow-y-auto" data-theme={theme}>
             <div className="max-w-screen relative">
                 <img src="/aboutbackground.jpg" alt="Black background for about page." className="h-[95vh] w-full"/>
                 <h2 className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-8xl text-white font-bold">About</h2>

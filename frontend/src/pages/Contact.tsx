@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react"
 import axios from "../services/axios";
+import { useThemeStore } from "../store/useThemeStore";
 
 interface ContactData {
     email: string;
@@ -8,6 +9,7 @@ interface ContactData {
 }
 
 export default function Contact(){
+    const { theme } = useThemeStore();
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState<null | string>(null);
     const [ contactData, setContactData ] = useState<ContactData>({
@@ -40,7 +42,7 @@ export default function Contact(){
     }
 
     return (
-        <div className="h-screen flex items-center justify-center" data-theme="light">
+        <div className="h-screen flex items-center justify-center" data-theme={theme}>
             <div className="border shadow-2xl max-w-xl w-full">
                 <div className="mb-8">
                     <h1 className="pt-8 pb-3 font-[Open Sans] font-semibold text-center text-5xl">Contact</h1>
