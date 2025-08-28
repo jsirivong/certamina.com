@@ -15,7 +15,7 @@ import { Server } from 'socket.io';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.NODE_ENV === "production" ? process.env.PROD_PORT : process.env.PORT;
 
 const server = createServer(app);
 
