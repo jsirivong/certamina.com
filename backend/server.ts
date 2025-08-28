@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors';
 import morgan from 'morgan'
 import auth from './routes/auth.route.ts';
-import room from './routes/room.route.ts'
+// import room from './routes/room.route.ts'
 // import email from './routes/email.route.ts'
 import practice from './routes/practice.route.ts';
 import { sql } from "./lib/database.ts"
@@ -27,7 +27,7 @@ app.use(cookieparser());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/v1/auth", auth)
-app.use("/api/v1/room", room)
+// app.use("/api/v1/room", room)
 // app.use("/api/v1/email", email)
 app.use("/api/v1/practice", practice)
 
