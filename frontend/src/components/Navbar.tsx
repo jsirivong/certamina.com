@@ -1,16 +1,20 @@
 import { Link } from "react-router";
 import { useLocation } from "react-router";
+import { useThemeStore } from "../store/useThemeStore";
 
 interface IProps {
     isAuthenticated?: boolean;
     children: React.ReactNode;
     username?: string | undefined;
     handleLogout: () => void;
+    loading: boolean;
 }
 
-export default function Navbar({ isAuthenticated, children, username, handleLogout }: IProps) {
+export default function Navbar({ isAuthenticated, children, username, handleLogout, loading }: IProps) {
     const location = useLocation();
     const pathname = location.pathname;
+
+    const { theme, setTheme } = useThemeStore();
 
     return (
         <>
@@ -53,15 +57,39 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                                 </div>
                                             </div>
 
-                                            <ul className="dropdown-content relative top-10 bg-base-100 rounded w-52 p-1 z-1 shadow-sm" tabIndex={0}>
-                                                <li role="button" className="btn btn-ghost w-full justify-start" onClick={handleLogout}><img src="/logout.png" className="size-5"/>Log out</li>
+                                            <ul className="dropdown-content relative top-10 bg-base-100 rounded w-52 z-1 shadow-l" tabIndex={0}>
+                                                <li role="button" className="btn btn-ghost w-full justify-start p-0">
+                                                    <label className="flex cursor-pointer gap-2 items-center w-full h-full pl-4">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            width="20"
+                                                            height="20"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="2"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round">
+                                                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                                        </svg>
+                                                        <input type="checkbox" value={theme} className="toggle theme-controller" checked={theme === "dark" ? true : false} onChange={(e) => {
+                                                            if (e.target.value === "light"){
+                                                                setTheme("dark")
+                                                            } else {
+                                                                setTheme("light")
+                                                            }
+                                                        }}/>
+                                                    </label>
+                                                </li>
+                                                <li role="button" className="btn btn-ghost w-full justify-start" onClick={handleLogout}><img src="/logout.png" className="size-5" />Log out</li>
                                             </ul>
                                         </div>
-                                        <h3 className="font-semibold text-sm">{username}</h3>
+                                        <h3 className="font-semibold text-sm border-b-2">{username}</h3>
                                     </div>
                                 ) : (
-                                    <Link className="border-2 px-5 rounded-3xl border-gray-500 btn" to={"/register"}>Sign Up</Link>
-                                )}
+                                    loading ? <span className="loading loading-spinner loading-lg"></span> : <Link className="border-2 px-5 rounded-3xl border-gray-500 btn" to={"/register"}>Sign Up</Link>
+                                )
+                                }
                             </>
                         )}
                     </div>
