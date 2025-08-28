@@ -2,23 +2,15 @@ import { Link } from "react-router";
 import { useLocation } from "react-router";
 
 interface IProps {
+    isAuthenticated?: boolean;
     children: React.ReactNode;
+    username?: string | undefined;
+    handleLogout: () => void;
 }
 
-export default function Navbar({ children }: IProps) {
+export default function Navbar({ isAuthenticated, children, username, handleLogout }: IProps) {
     const location = useLocation();
     const pathname = location.pathname;
-    // const navigate = useNavigate();
-
-    // const handleLogout = async () => {
-    //     try {
-    //         navigate("/login")
-
-    //         await axios.post("/auth/logout");
-    //     } catch (err: any) {
-    //         setError(err.response.data?.message);
-    //     }
-    // }
 
     return (
         <>
@@ -48,16 +40,27 @@ export default function Navbar({ children }: IProps) {
                                         </div>
                                     )}
                                 </div>
-                                {true && (
-                                    <div className="flex flex-row gap-2 items-center">
-                                        <div className="avatar">
-                                            <div className="w-8 rounded-full">
-                                                <img
-                                                    alt="User Avatar"
-                                                    src="/avatar-placeholder.jpg" />
+                                {isAuthenticated ? (
+                                    <div className="flex flex-row gap-2 gap-x-4 items-center">
+                                        <div className="dropdown dropdown-end">
+                                            <div className="avatar hover:cursor-pointer" tabIndex={0} role="button">
+                                                <div className="ring-black rounded-full ring-2">
+                                                    <div className="w-8 rounded-full">
+                                                        <img
+                                                            alt="User Avatar"
+                                                            src="/avatar-placeholder.jpg" />
+                                                    </div>
+                                                </div>
                                             </div>
+
+                                            <ul className="dropdown-content relative top-10 bg-base-100 rounded w-52 p-1 z-1 shadow-sm" tabIndex={0}>
+                                                <li role="button" className="btn btn-ghost w-full justify-start" onClick={handleLogout}><img src="/logout.png" className="size-5"/>Log out</li>
+                                            </ul>
                                         </div>
+                                        <h3 className="font-semibold text-sm">{username}</h3>
                                     </div>
+                                ) : (
+                                    <Link className="border-2 px-5 rounded-3xl border-gray-500 btn" to={"/register"}>Sign Up</Link>
                                 )}
                             </>
                         )}
