@@ -13,10 +13,12 @@ import Practice from "./pages/Practice.tsx";
 import Contact from "./pages/Contact.tsx";
 import axios from "./services/axios.ts";
 import { useState } from "react";
+import { useThemeStore } from "./store/useThemeStore.ts";
 
 export default function App() {
   const [user, setUser] = useState<{ email: string, username: string } | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     (async () => {
@@ -56,16 +58,16 @@ export default function App() {
   }
 
   return (
-    <div data-theme="light">
+    <div data-theme={theme}>
       <Routes>
-        <Route path="/" element={<Footer><Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Home /></Navbar></Footer>} />
+        <Route path="/" element={<Footer><Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Home /></Navbar></Footer>} />
         <Route path="/register" element={!Boolean(user) ? (<Footer><Register /></Footer>) : <Navigate to={"/"} />} />
         <Route path="/login" element={!Boolean(user) ? <Footer><Login /></Footer> : <Navigate to={"/"} />} />
-        <Route path="/join" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Join /></Navbar>} />
-        <Route path="/room/:code" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Room /></Navbar>} />
-        <Route path="/about" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Footer><About /></Footer></Navbar>} />
-        <Route path="/practice" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Practice /></Navbar>} />
-        <Route path="/contact" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout}><Footer><Contact /></Footer></Navbar>} />
+        <Route path="/join" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Join /></Navbar>} />
+        <Route path="/room/:code" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Room /></Navbar>} />
+        <Route path="/about" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><About /></Footer></Navbar>} />
+        <Route path="/practice" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Practice /></Navbar>} />
+        <Route path="/contact" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Contact /></Footer></Navbar>} />
       </Routes>
     </div>
   )
