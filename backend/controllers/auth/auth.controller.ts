@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
             secure: process.env.NODE_ENV === "production",
             httpOnly: process.env.NODE_ENV === "production", // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict", // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         res.status(201).json({ success: true, user: user })
@@ -113,7 +113,7 @@ export const register = async (req: Request, res: Response) => {
             secure: process.env.NODE_ENV === "production",
             httpOnly: process.env.NODE_ENV === "production", // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict", // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         return res.status(201).json({success: true, user: user})
