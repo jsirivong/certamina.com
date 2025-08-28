@@ -120,6 +120,6 @@ export const register = async (req: Request, res: Response) => {
         return res.status(201).json({success: true, user: user})
     } catch (err) {
         console.error("Error in auth controller.\n", err);
-        return res.status(500).json({ success: false, message: "Internal server error." })
+        return res.status(500).json({ success: false, message: "Internal server error."})
     }
 }
