@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react"
 import axios from "../services/axios.ts";
+import { useNavigate } from "react-router";
 
 interface LoginData {
     email: string;
@@ -7,6 +8,7 @@ interface LoginData {
 }
 
 export default function Login() {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
     const [loginData, setLoginData] = useState<LoginData>({
@@ -23,6 +25,7 @@ export default function Login() {
 
             if (response.data.success){
                 setError(null);
+                navigate("/");
             }
         } catch (err: any) {
             setError(err.response.data?.message);
