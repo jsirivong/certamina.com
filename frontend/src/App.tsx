@@ -43,7 +43,6 @@ export default function App() {
       const response = await axios.post("/auth/logout");
 
       if (response.data.success) {
-        console.log("Successfully logged out");
         setUser(null);
       }
     } catch (err: any) {
