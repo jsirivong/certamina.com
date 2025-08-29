@@ -6,8 +6,8 @@ interface IProps {
     isAuthenticated?: boolean;
     children: React.ReactNode;
     username?: string | undefined;
-    handleLogout: () => void;
-    loading: boolean;
+    handleLogout?: () => void;
+    loading?: boolean;
 }
 
 export default function Navbar({ isAuthenticated, children, username, handleLogout, loading }: IProps) {
