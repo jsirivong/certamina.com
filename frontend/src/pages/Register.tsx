@@ -85,7 +85,7 @@ export default function Register() {
                         <div>
                             <button className="btn w-full">
                                 <>
-                                    <img src="google.png" alt="Google Sign-In" className="bg-base-100 size-5" />
+                                    <img src="/google.png" alt="Google Sign-In" className="size-5" />
                                     Continue with Google
                                 </>
                             </button>
