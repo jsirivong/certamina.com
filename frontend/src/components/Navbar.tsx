@@ -92,7 +92,7 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                         <h3 className="font-semibold text-sm border-b-2">{username}</h3>
                                     </div>
                                 ) : (
-                                    loading ? <span className="loading loading-spinner loading-lg"></span> : <Link className="border-2 px-5 rounded-3xl border-gray-500 btn" to={"/register"}>Sign Up</Link>
+                                    !loading ? (<Link className="border-2 tracking-wider border-yellow-500 px-5 rounded-none bg-base-100 btn btn-soft hover:bg-yellow-600" to={"/register"}>Sign Up</Link>) : (<span className="loading loading-spinner loading-lg"></span>)
                                 )
                                 }
                             </>
