@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import axios from "../services/axios.ts";
 import { useNavigate } from "react-router";
+import useAuthentication from "../hooks/useAuthentication.tsx";
 
 interface RegisterData {
     username: string;
@@ -8,9 +9,18 @@ interface RegisterData {
     email: string;
 }
 
+
 export default function Register() {
     const navigate = useNavigate();
+    const { checkAuthentication } = useAuthentication();
     const [loading, setLoading] = useState<boolean>(false);
+    // const [messages, setMessages] = useState(
+    //     {
+    //         username: "",
+    //         password: "",
+    //         email: ""
+    //     }
+    // )
     const [error, setError] = useState<null | string>(null);
     const [registerData, setRegisterData] = useState<RegisterData>({
         username: "",
@@ -18,16 +28,26 @@ export default function Register() {
         email: ""
     })
 
+    useEffect(() => {
+        (async () => {
+            try {
+                
+            } catch (err: any) {
+
+            }
+        })()
+    }, [registerData])
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
 
         try {
             const response = await axios.post("/auth/register", registerData)
 
             if (response.data.success) {
-                navigate("/");
                 setError(null);
+                navigate("/");
+                checkAuthentication();
             }
         } catch (err: any) {
             setError(err.response.data?.message);
@@ -57,7 +77,7 @@ export default function Register() {
                                 <label className="label">
                                     <span className="label-text mb-2 font-semibold">Username</span>
                                 </label>
-                                <input className="input input-bordered w-full" type="text" placeholder="Username" value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} required />
+                                <input className="input input-bordered w-full border-green-400 focus:outline-green-400" type="text" placeholder="Username" value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} required />
                                 <p className="text-base-content/60 text-sm">
                                     Username must be at least 6 characters*
                                 </p>
@@ -66,7 +86,7 @@ export default function Register() {
                                 <label className="label">
                                     <span className="label-text mb-2 font-semibold">Password</span>
                                 </label>
-                                <input className="input input-bordered w-full" type="password" placeholder="Password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} required />
+                                <input className="input input-bordered w-full border-green-400 focus:outline-green-400" type="password" placeholder="Password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} required/>
                                 <p className="text-base-content/60 text-sm">
                                     Password must be at least 8 characters*
                                 </p>
@@ -75,7 +95,7 @@ export default function Register() {
                                 <label className="label">
                                     <span className="label-text mb-2 font-semibold">Email</span>
                                 </label>
-                                <input className="input input-bordered w-full" type="email" placeholder="Email" value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} required />
+                                <input className="input input-bordered w-full border-green-400 focus:outline-green-400" type="email" placeholder="Email" value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} required />
                             </div>
                         </div>
 
