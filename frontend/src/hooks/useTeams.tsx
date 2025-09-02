@@ -14,16 +14,12 @@ interface Team {
 }
 
 export default function useTeams(){
-    const [ teams ] = useState<Team[]>([
+    const [ teams, setTeams ] = useState<Team[]>([
         {
             id: 1,
             name: "Team 1",
             score: 0,
-            players: [
-                {
-                    username: "Devin"
-                }
-            ]
+            players: []
         },
         {
             id: 2,
@@ -39,5 +35,5 @@ export default function useTeams(){
         }
     ]);
     
-    return { teams }
+    return { teams, setTeams }
 }

@@ -43,7 +43,7 @@ export const login = async (req: Request, res: Response) => {
 
         if (!user) { return res.status(404).json({ success: false, message: "Email does not exist." }) }
 
-        if (!comparePassword(password, user.password)) return res.status(404).json({ success: false, message: "Password does not match." });
+        if (!await comparePassword(password, user.password)) return res.status(404).json({ success: false, message: "Password does not match." });
 
         const payload: JwtPayload = {
             sub: user.id.toString()
@@ -76,6 +76,10 @@ export const register = async (req: Request, res: Response) => {
 
         if (!username || !password || !email) {
             return res.status(400).json({ success: false, message: "Please provide all credentials." });
+        }
+
+        if (username.length > 25){
+            return res.status(400).json({ success: false, message: "Username cannot be more than 25 characters long."})
         }
 
         if (password.length < 8) {

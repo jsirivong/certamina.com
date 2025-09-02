@@ -1,26 +1,27 @@
 import { useState } from "react";
-import type User from "../types/User";
 import axios from "../services/axios.ts";
+import { useUserStore } from "../store/useUserStore.ts";
 
 export default function useAuthentication() {
     const [loading, setLoading] = useState<boolean>(false);
-    const [user, setUser] = useState<User>()
+    const { user, setUser } = useUserStore();
 
     const checkAuthentication = async () => {
-        setLoading(true);
-
         try {
+            setLoading(true)
             const response = await axios.get("/auth")
 
-            if (response.data.user) {
-                setUser(response.data.user);
+            if (response.data.success) {
+                setUser(response.data.user)
+            } else {
+                setUser(null);
             }
         } catch (err: any) {
-            console.log(err)
+            setUser(null);
         } finally {
             setLoading(false);
         }
     }
 
-    return { loading, user, checkAuthentication }
+    return { loading, user, setUser, checkAuthentication }
 }

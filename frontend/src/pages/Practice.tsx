@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import PageLoading from "../components/PageLoading";
-import axios from "../services/axios";
+import { useThemeStore } from "../store/useThemeStore";
+import Navbar from "../components/Navbar";
+import InPractice from "./InPractice";
 
 type Difficulty = "Novice" | "Intermediate" | "Advanced";
 
 export default function Practice() {
+    const { theme } = useThemeStore();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
     const [inPractice, setInPractice] = useState<boolean>(false);
@@ -16,11 +19,10 @@ export default function Practice() {
             setLoading(true)
 
             try {
-                const response = await axios.get("/practice/inpractice");
-
-                if (response.data.success){
-                    setInPractice(response.data.inpractice);
-                    setError(null);
+                if (localStorage.getItem("inpractice") === "true"){
+                    setInPractice(true);
+                } else {
+                    setInPractice(false);
                 }
             } catch (err: any) {
                 setError(err.response.data?.message);
@@ -36,15 +38,16 @@ export default function Practice() {
             if (!inPractice) {
                 setInPractice(true);
 
-                const response = await axios.post("/practice");
-
-                if (response.data.success) {
-                    setError(null)
-                }
+                localStorage.setItem("inpractice", "true")
             }
         } catch (err: any) {
             setError(err.response.data?.message);
         }
+    }
+
+    const handleEndPractice = () => {
+        localStorage.setItem("inpractice", "false");
+        setInPractice(false);
     }
 
     if (loading) {
@@ -52,10 +55,10 @@ export default function Practice() {
     }
 
     return (
-        <div className="h-screen p-20 flex items-center justify-center" data-theme="light">
+        <div className="h-screen p-30 flex items-center justify-center" data-theme={theme}>
             {!inPractice ? (<div className="w-full h-full shadow-2xl relative">
                 <div className="p-6">
-                    <a href="/" className="text-lg font-[Open Sans]">{"<"} Back</a>
+                    <a href="/" className="text-lg font-semibold font-[Open Sans]">{"<"} Back</a>
                     <h1 className="text-center text-4xl font-bold font-[Open Sans]">Practice</h1>
                 </div>
 
@@ -82,18 +85,11 @@ export default function Practice() {
                     </div>
                 </div>
 
-                <div className="absolute top-full">
-                    <button className="w-[50vw] btn btn-soft mx-auto text-center" onClick={handleSubmit}>Practice</button>
+                <div className="flex mx-auto w-[30vw]">
+                    <button className="mx-auto text-xl font-semibold font-[Open Sans] p-2 btn btn-soft w-full" onClick={handleSubmit}>Practice</button>
                 </div>
-            </div>) : (
-                <div>
-                    <div className="mx-auto relative top-[40vh]">
-                        <button>
-                            <img src="/emergency-stop.png" alt="Practice Buzzer" className="size-36 hover:cursor-pointer"/>
-                        </button>
-                    </div>
-                </div>
-            )}
+
+            </div>) : (<Navbar><InPractice questions={questions} difficulty={difficulty} handleEndPractice={handleEndPractice}/></Navbar>)}
         </div>
     )
 }

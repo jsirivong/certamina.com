@@ -12,30 +12,17 @@ import About from "./pages/About.tsx";
 import Practice from "./pages/Practice.tsx";
 import Contact from "./pages/Contact.tsx";
 import axios from "./services/axios.ts";
-import { useState } from "react";
 import { useThemeStore } from "./store/useThemeStore.ts";
+import useAuthentication from "./hooks/useAuthentication.tsx";
+import Donate from "./pages/Donate.tsx";
+import Settings from "./pages/Settings.tsx";
 
 export default function App() {
-  const [user, setUser] = useState<{ email: string, username: string } | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { user, setUser, loading, checkAuthentication } = useAuthentication();
   const { theme } = useThemeStore();
 
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await axios.get("/auth")
-
-        if (response.data.success) {
-          setUser(response.data.user)
-        } else {
-          setUser(null)
-        }
-      } catch (err: any) {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    })()
+    checkAuthentication();
   }, [])
 
   const handleLogout = async () => {
@@ -43,8 +30,7 @@ export default function App() {
       const response = await axios.post("/auth/logout");
 
       if (response.data.success) {
-        console.log("Successfully logged out");
-        setUser(null);
+        setUser(null)
       }
     } catch (err: any) {
       console.error(err);
@@ -68,6 +54,8 @@ export default function App() {
         <Route path="/about" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><About /></Footer></Navbar>} />
         <Route path="/practice" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Practice /></Navbar>} />
         <Route path="/contact" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Contact /></Footer></Navbar>} />
+        <Route path="/donate" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Donate /></Footer></Navbar>} />
+        <Route path="/settings" element={!Boolean(user) ? <Navigate to={"/login"}/> : <Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Settings /></Footer></Navbar>} />
       </Routes>
     </div>
   )
