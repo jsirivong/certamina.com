@@ -17,4 +17,8 @@ router.get("/", authorizeUser, (req: AuthorizedUserRequest, res: Response ) => {
     res.status(200).json({success: true, user: req.user})
 })
 
+// router.post("/login/username-status", () => {
+
+// })
+
 export default router;
