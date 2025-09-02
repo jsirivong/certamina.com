@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react"
 import axios from "../services/axios.ts";
 import { useNavigate } from "react-router";
+import useAuthentication from "../hooks/useAuthentication.tsx";
 
 interface LoginData {
     email: string;
@@ -8,6 +9,7 @@ interface LoginData {
 }
 
 export default function Login() {
+    const { checkAuthentication } = useAuthentication();
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
@@ -23,9 +25,10 @@ export default function Login() {
         try {
             const response = await axios.post("/auth/login", loginData);
 
-            if (response.data.success){
+            if (response.data.success) {
                 setError(null);
                 navigate("/");
+                checkAuthentication();
             }
         } catch (err: any) {
             setError(err.response.data?.message);
