@@ -4,6 +4,8 @@ import { sql } from '../lib/database.ts';
 import type User from '../types/User.ts';
 import type AuthorizedUserRequest from '../types/AuthorizedUserRequest.ts';
 
+// TODO: create a redis cache for the user 
+
 export const authorizeUser = async (req: AuthorizedUserRequest, res: Response, next: NextFunction) => {
     try {
         const token = req.cookies.token;
