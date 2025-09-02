@@ -5,11 +5,12 @@ import useTeams from "../hooks/useTeams.tsx";
 
 export default function Room() {
     // const { code } = useParams();
-    const { teams } = useTeams();
+    const { teams, setTeams } = useTeams();
 
     useEffect(() => {
-        socket.on("joinRoom", (player: { id?: number | string, username: string, profile_picture?: string }) => {
-            console.log(player)
+        socket.on("player-join", (username: string) => {
+            teams[0].players.push({username});
+            setTeams({...teams});
         })
     }, [])
 
@@ -22,7 +23,7 @@ export default function Room() {
                     </div>
                     <ul className="list gap-y-2">
                         {teams[0].players.map((val) => (
-                            <PlayerCard key={Date.now()} username={val.username} />
+                            <PlayerCard key={socket.id} username={val.username} />
                         ))}
                     </ul>
                 </div>
