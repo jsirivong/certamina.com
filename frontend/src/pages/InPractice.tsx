@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 interface IProps {
-    questions: number;
+    questions?: number;
     difficulty: "Novice" | "Intermediate" | "Advanced";
     handleEndPractice: () => void;
 }
 
-export default function InPractice({ questions, difficulty, handleEndPractice }: IProps) {
-    const [ tossupQuestion, setTossupQuestion ] = useState<number>(1);
+export default function InPractice({difficulty, handleEndPractice }: IProps) {
+    const [ tossupQuestion ] = useState<number>(1);
 
     return (
         <div className="h-screen">
