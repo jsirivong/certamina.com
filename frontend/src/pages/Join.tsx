@@ -1,8 +1,6 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import { socket } from "../sockets/socket";
 import { useThemeStore } from "../store/useThemeStore";
-import useAuthentication from "../hooks/useAuthentication";
 
 export default function Join() {
     const { theme } = useThemeStore();
