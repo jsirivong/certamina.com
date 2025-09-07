@@ -14,7 +14,7 @@ import { Server } from 'socket.io';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.NODE_ENV === "production" ? process.env.PROD_PORT : process.env.PORT;
+const PORT = process.env.PORT;
 
 const server = createServer(app);
 
@@ -47,6 +47,7 @@ const initializeUsersDatabase = async () => {
     }
 }
 
+// socket.io server instance
 const io = new Server(server, { 
     cors: {
         origin: ["https://certamina.com", "http://localhost:5173"]
