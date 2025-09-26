@@ -21,18 +21,19 @@ export default function App() {
   const { user, setUser, loading, checkAuthentication } = useAuthentication();
   const { theme } = useThemeStore();
 
+  console.log(user)
+
   useEffect(() => {
     checkAuthentication();
   }, [])
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post("/auth/logout");
+      await axios.post("/auth/logout");
 
-      if (response.data.success) {
-        setUser(null)
-      }
+      setUser(null)
     } catch (err: any) {
+      setUser(null);
       console.error(err);
     }
   }
@@ -47,7 +48,7 @@ export default function App() {
     <div data-theme={theme}>
       <Routes>
         <Route path="/" element={<Footer><Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Home /></Navbar></Footer>} />
-        <Route path="/register" element={!Boolean(user) ? (<Footer><Register /></Footer>) : <Navigate to={"/"} />} />
+        <Route path="/register" element={!Boolean(user) && user?.username === undefined  && user?.email === undefined ? (<Footer><Register /></Footer>) : <Navigate to={"/"} />} />
         <Route path="/login" element={!Boolean(user) ? <Footer><Login /></Footer> : <Navigate to={"/"} />} />
         <Route path="/join" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Join /></Navbar>} />
         <Route path="/room/:code" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Room /></Navbar>} />

@@ -55,14 +55,14 @@ export default function Practice() {
     }
 
     return (
-        <div className="h-screen p-30 flex items-center justify-center" data-theme={theme}>
+        <div className="h-screen" data-theme={theme}>
             {!inPractice ? (<div className="w-full h-full shadow-2xl relative">
                 <div className="p-6">
                     <a href="/" className="text-lg font-semibold font-[Open Sans]">{"<"} Back</a>
                     <h1 className="text-center text-4xl font-bold font-[Open Sans]">Practice</h1>
                 </div>
 
-                <div className="max-w-screen w-full p-5">
+                <div className="max-w-screen w-full px-20">
                     <div className="space-y-7">
                         <div className="flex flex-col">
                             <label className="input font-semibold">
@@ -89,7 +89,7 @@ export default function Practice() {
                     <button className="mx-auto text-xl font-semibold font-[Open Sans] p-2 btn btn-soft w-full" onClick={handleSubmit}>Practice</button>
                 </div>
 
-            </div>) : (<Navbar><InPractice questions={questions} difficulty={difficulty} handleEndPractice={handleEndPractice}/></Navbar>)}
+            </div>) : (<InPractice questions={questions} difficulty={difficulty} handleEndPractice={handleEndPractice}/>)}
         </div>
     )
 }

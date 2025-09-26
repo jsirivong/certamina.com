@@ -15,8 +15,7 @@
 //             host: "localhost",
 //             port: 587,
 //             secure: false,
-//         })
-
+//         }) 
 //         const info = await transporter.sendMail({
 //             from: `"${name}" <${email}>`,
 //             to: "sirivongjonathan@gmail.com",
