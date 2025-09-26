@@ -1,7 +1,7 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import axios from "../services/axios";
 import { useNavigate } from "react-router";
-import { socket } from "../sockets/socket";
-import { useThemeStore } from "../store/useThemeStore";
+// import io from 'socket.io-client';
 import useAuthentication from "../hooks/useAuthentication";
 
 export default function Join() {

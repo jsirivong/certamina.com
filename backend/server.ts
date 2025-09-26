@@ -47,6 +47,7 @@ const initializeUsersDatabase = async () => {
     }
 }
 
+// socket.io server instance
 const io = new Server(server, { 
     cors: {
         origin: ["https://certamina.com", "http://localhost:5173"]

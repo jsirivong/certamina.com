@@ -11,6 +11,8 @@ export default function useAuthentication() {
             setLoading(true)
             const response = await axios.get("/auth")
 
+            console.log(response.data)
+
             if (response.data.success) {
                 setUser(response.data.user)
             } else {

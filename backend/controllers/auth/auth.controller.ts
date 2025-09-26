@@ -57,10 +57,10 @@ export const login = async (req: Request, res: Response) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
 
         res.cookie("token", token, {
-            secure: true ? process.env.NODE_ENV === "production" : false,
+            secure: true ? process.env.NODE_ENV==="production" : false,
             httpOnly: true ? process.env.NODE_ENV === "production" : false, // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict" // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         res.status(200).json({ success: true, user: user })
@@ -80,6 +80,10 @@ export const register = async (req: Request, res: Response) => {
 
         if (username.length > 25) {
             return res.status(400).json({ success: false, message: "Username cannot be more than 25 characters long." })
+        }
+
+        if (username.length > 25){
+            return res.status(400).json({ success: false, message: "Username cannot be more than 25 characters long."})
         }
 
         if (password.length < 8) {
@@ -114,15 +118,15 @@ export const register = async (req: Request, res: Response) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, options)
 
         res.cookie("token", token, {
-            secure: true ? process.env.NODE_ENV === "production" : false,
-            httpOnly: true ? process.env.NODE_ENV === "production" : false, // only in development, true for production
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: process.env.NODE_ENV === "production", // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "strict" // stops XSS attacks (cross-site scripting)
+            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         return res.status(201).json({ success: true, user: user })
     } catch (err) {
         console.error("Error in auth controller.\n", err);
-        return res.status(500).json({ success: false, message: "Internal server error." })
+        return res.status(500).json({ success: false, message: "Internal server error.", error: err })
     }
 }
