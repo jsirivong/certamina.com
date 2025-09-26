@@ -29,11 +29,7 @@ export default function Home() {
                     </div>
                 </div>
 
-
                 <div className="grid grid-cols-2 bg-base-300 h-[70vh] p-20 w-full gap-x-20">
-                    <div>
-
-                    </div>
                     <div className="max-w-[70vw] flex flex-col space-y-6 mx-auto justify-center">
                         <h2 className="font-bold text-3xl lg:text-5xl text-purple-600">Practice anywhere, everywhere, nonstop</h2>
                         <p className="text-md font-semibold">Doesn't matter where you are, Certamina sets you up in a simulated game of Certamen as many times as you want.</p>
