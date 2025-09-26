@@ -45,7 +45,7 @@ export default function App() {
   }
 
   return (
-    <div data-theme={theme}>
+    <div data-theme={theme} className="overflow-x-hidden">
       <Routes>
         <Route path="/" element={<Footer><Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Home /></Navbar></Footer>} />
         <Route path="/register" element={!Boolean(user) && user?.username === undefined  && user?.email === undefined ? (<Footer><Register /></Footer>) : <Navigate to={"/"} />} />
