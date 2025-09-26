@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import PageLoading from "../components/PageLoading";
 import { useThemeStore } from "../store/useThemeStore";
-import Navbar from "../components/Navbar";
 import InPractice from "./InPractice";
 
 type Difficulty = "Novice" | "Intermediate" | "Advanced";

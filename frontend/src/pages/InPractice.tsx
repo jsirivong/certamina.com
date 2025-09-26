@@ -10,8 +10,8 @@ export default function InPractice({ difficulty, handleEndPractice }: IProps) {
     const [tossupQuestion] = useState<number>(1);
     const [showBuzz, setShowBuzz] = useState<boolean>(true);
     const [showTextbox, setShowTextbox] = useState<boolean>(false);
-    const [ question, setQuestion ] = useState("What daughters of Achelous may have been attendants of Persephone, resided on the island ofAnthemoessa, and forced Odysseus’s men to use wax to not be drowned by their deadly song?");
-    const [ timer, setTimer ] = useState<number>(10);
+    const [ question ] = useState("What daughters of Achelous may have been attendants of Persephone, resided on the island ofAnthemoessa, and forced Odysseus’s men to use wax to not be drowned by their deadly song?");
+    // const [ timer, setTimer ] = useState<number>(10);
 
     const handleBuzz = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
