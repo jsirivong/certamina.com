@@ -11,7 +11,7 @@ interface IProps {
     loading?: boolean | undefined;
 }
 
-export default function Navbar({isAuthenticated, children, username, handleLogout, loading }: IProps) {
+export default function Navbar({ isAuthenticated, children, username, handleLogout, loading }: IProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
@@ -48,14 +48,12 @@ export default function Navbar({isAuthenticated, children, username, handleLogou
                                 <div className="flex flex-row gap-2 gap-x-4 items-center">
                                     <div className="dropdown dropdown-end">
                                         <div className="avatar hover:cursor-pointer" tabIndex={0} role="button">
-                                            <div className="rounded-full ring-2">
+                                            <div className="ring-black rounded-full ring-2">
                                                 <div className="w-8 rounded-full">
                                                     <img
                                                         alt="User Avatar"
                                                         src="/avatar-placeholder.jpg" />
                                                 </div>
-                                            </div>
-                                            <div className="size-3 bg-green-400 rounded-full absolute left-full top-full -translate-x-5/6 -translate-y-5/6">
                                             </div>
                                         </div>
 

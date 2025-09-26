@@ -10,6 +10,7 @@ interface RegisterData {
     email: string;
 }
 
+
 export default function Register() {
     const navigate = useNavigate();
     const { checkAuthentication } = useAuthentication();

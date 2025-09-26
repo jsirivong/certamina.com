@@ -54,7 +54,7 @@ export default function Practice() {
     }
 
     return (
-        <div className="h-screen" data-theme={theme}>
+        <div className="h-screen p-30 flex items-center justify-center" data-theme={theme}>
             {!inPractice ? (<div className="w-full h-full shadow-2xl relative">
                 <div className="p-6">
                     <a href="/" className="text-lg font-semibold font-[Open Sans]">{"<"} Back</a>

@@ -11,10 +11,12 @@ export default function useAuthentication() {
             setLoading(true)
             const response = await axios.get("/auth")
 
-            if (response.data.user){
-                if (response.data.user.username && response.data.user.email){
-                    setUser(response.data.user);
-                }
+            console.log(response.data)
+
+            if (response.data.success) {
+                setUser(response.data.user)
+            } else {
+                setUser(null);
             }
         } catch (err: any) {
             setUser(null);

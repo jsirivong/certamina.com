@@ -31,7 +31,7 @@ export default function App() {
     try {
       await axios.post("/auth/logout");
 
-      setUser(null)
+      setUser(null);
     } catch (err: any) {
       setUser(null);
       console.error(err);

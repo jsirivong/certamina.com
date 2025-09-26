@@ -5,9 +5,9 @@ import { authorizeUser } from '../middleware/authorization.ts';
 
 const router = express.Router();
 
-router.post("/register", register)
+router.post("/register", register);
 router.post("/login", login)
-router.post("/logout", authorizeUser, (req: Request, res: Response) => {
+router.post("/logout", authorizeUser, (req: AuthorizedUserRequest, res: Response) => {
     res.clearCookie("token", {
         httpOnly: process.env.NODE_ENV === "production",
         secure: process.env.NODE_ENV === "production",
