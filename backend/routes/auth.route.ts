@@ -5,7 +5,7 @@ import { authorizeUser } from '../middleware/authorization.ts';
 
 const router = express.Router();
 
-router.post("/register", register)
+router.post("/register", register);
 router.post("/login", login)
 router.post("/logout", (req: Request, res: Response) => {
     res.clearCookie("token");
