@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { validateEmailFormat } from '../utils/utils.ts';
+import { validateEmailFormat } from '../util/utils.ts';
 import useDebounce from "../hooks/useDebounce.tsx";
 
 interface RegisterData {
