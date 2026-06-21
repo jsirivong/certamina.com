@@ -10,7 +10,6 @@ interface RegisterData {
     email: string;
 }
 
-
 export default function Register() {
     const navigate = useNavigate();
     const { checkAuthentication } = useAuthentication();
@@ -44,7 +43,7 @@ export default function Register() {
     }
 
     return (
-        <div className="h-screen flex justify-center" data-theme="light">
+        <div className="h-screen flex justify-center" data-theme="dark">
             <div className="max-w-screen bg-base-100 w-full p-10 lg:flex lg:flex-row">
                 <div className="max-w-[100vh] lg:max-w-[50vw] w-full">
                     <div className="p-6">
@@ -103,12 +102,13 @@ export default function Register() {
                                     </>
                                 ) : `Create Account >`}
                             </button>
-                            <p className="text-center text-base-content/70 mt-4">
-                                Already have an account?{" "}
-                                <a className="link" href="/login">Login</a>
-                            </p>
                         </div>
                     </form>
+
+                    <p className="text-center text-base-content/70 mt-4">
+                        Already have an account?{" "}
+                        <a className="link" onClick={() => navigate("/login")}>Login</a>
+                    </p>
                 </div>
 
                 <div className="hidden lg:block max-w-[50vw] max-h-[70vh] w-full bg-base-100 p-10 text-center">

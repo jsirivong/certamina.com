@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react"
 import axios from "../services/axios.ts";
 import { useNavigate } from "react-router";
-import useAuthentication from "../hooks/useAuthentication.tsx";
 
 interface LoginData {
     email: string;
@@ -9,7 +8,6 @@ interface LoginData {
 }
 
 export default function Login() {
-    const { checkAuthentication } = useAuthentication();
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<null | string>(null);
@@ -25,10 +23,9 @@ export default function Login() {
         try {
             const response = await axios.post("/auth/login", loginData);
 
-            if (response.data.success) {
+            if (response.data.user) {
                 setError(null);
                 navigate("/");
-                checkAuthentication();
             }
         } catch (err: any) {
             setError(err.response.data?.message);
@@ -39,7 +36,7 @@ export default function Login() {
     }
 
     return (
-        <div className="h-screen flex items-center justify-center" data-theme="light">
+        <div className="h-screen flex items-center justify-center" data-theme="dark">
             <div className="bg-base-100 max-w-xl w-full p-10">
                 <div className="flex justify-center">
                     <img src="certaminaicon.png" alt="Certamina Icon Login" className="size-20" />
@@ -92,7 +89,7 @@ export default function Login() {
                         </button>
                         <p className="text-center text-base-content/70 mt-4">
                             Don't have an account?{" "}
-                            <a className="link" href="/register">Create One</a>
+                            <a className="link" onClick={() => navigate("/register")}>Create One</a>
                         </p>
                     </div>
                 </form>

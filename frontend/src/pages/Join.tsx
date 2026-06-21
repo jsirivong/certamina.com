@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useThemeStore } from "../store/useThemeStore";
+import axios from "../services/axios.ts";
 
 export default function Join() {
     const { theme } = useThemeStore();
@@ -14,11 +15,16 @@ export default function Join() {
         setLoading(true);
         
         try {
-            navigate(`/room/${code}`)
-        } catch (err: any) {
-            setError(err.response.data?.message);
-            console.error(err);
-        } finally {
+            setLoading(true);
+            const response = await axios.post(`/room/status/${code}`);
+
+            if (response.data.exists){
+                navigate(`/username?code=${code}`);
+            }
+        } catch (e: any){
+            console.error("Error joining room.", e);
+            setError(e);
+        } finally{
             setLoading(false);
         }
     }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "../services/axios.ts";
 import { useUserStore } from "../store/useUserStore.ts";
 
@@ -9,16 +9,15 @@ export default function useAuthentication() {
     const checkAuthentication = async () => {
         try {
             setLoading(true)
-            const response = await axios.get("/auth")
+            const response = await axios.get("/auth", {withCredentials: true})
 
-            console.log(response.data)
-
-            if (response.data.success) {
+            if (response.data.user && response.data.authenticated) {
                 setUser(response.data.user)
             } else {
                 setUser(null);
             }
         } catch (err: any) {
+            console.log("Authentication check failed:", err);
             setUser(null);
         } finally {
             setLoading(false);

@@ -19,7 +19,7 @@ export default function Settings() {
                 </div>
                 <div className="px-8 flex flex-col justify-center">
                     <button className="btn btn-ghost w-full font-normal text-lg">Profile</button>
-                    <button className="btn btn-ghost w-full font-normal text-lg">Stats</button>
+                    <button className="btn btn-ghost w-full font-normal text-lg">Practices</button>
                 </div>
             </div>
             <div className="h-screen w-screen bg-base-100">

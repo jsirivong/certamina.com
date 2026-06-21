@@ -2,6 +2,9 @@ import { Link, useNavigate } from "react-router";
 import { useLocation } from "react-router";
 import { useThemeStore } from "../store/useThemeStore";
 import { MenuIcon } from 'lucide-react';
+import { useState } from "react";
+import PageLoading from "./PageLoading";
+import axios from "../services/axios";
 
 interface IProps {
     isAuthenticated?: boolean;
@@ -15,7 +18,6 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
-
     const { theme, setTheme } = useThemeStore();
 
     return (
@@ -28,7 +30,7 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                     </Link>
                 </div>
                 <div className="container">
-                    <div className="flex items-center justify-end gap-10 px-10">
+                    <div className="flex items-center justify-end md:gap-10 gap-4 px-10">
                         <>
                             <div className="gap-3 lg:block hidden">
                                 <a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/contact" && "border-b-purple-500 border-b-3"}`} href="/contact">Contact</a>
@@ -37,10 +39,16 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                 <div className="dropdown">
                                     <button tabIndex={0} role="button" className="btn btn-ghost rounded-none tracking-wider ">Play</button>
 
-                                    <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                                    <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-38 p-2 shadow-sm font-semibold tracking-wider">
                                         <li><a href="/practice">Practice</a></li>
                                         <li><a href="/join">Join</a></li>
-                                        <li><a href="/host">Host</a></li>
+                                        <li><a onClick={() => {
+                                            if (!isAuthenticated){
+                                                return navigate("/login");
+                                            }
+
+                                            navigate("/room", {state: {role: "host"}});
+                                        }}>Host</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -92,8 +100,8 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                             )
                             }
                             <div className="dropdown dropdown-left">
-                                <div role="button" tabIndex={0} className="btn btn-ghost p-2 lg:hidden">
-                                    <MenuIcon />
+                                <div role="button" tabIndex={0} className="btn btn-ghost lg:hidden">
+                                    <MenuIcon/>
                                 </div>
                                 <ul className="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-3 md:w-52 w-40 p-2 shadow" tabIndex={0}>
                                     <li><a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/contact" && "border-b-purple-500 border-b-3"}`} href="/contact">Contact</a></li>
@@ -105,7 +113,7 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                         <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
                                             <li><a href="/practice">Practice</a></li>
                                             <li><a href="/join">Join</a></li>
-                                            <li><a href="/host">Host</a></li>
+                                            <li><a href="/room">Host</a></li>
                                         </ul>
                                     </div></li>
                                 </ul>
