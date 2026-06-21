@@ -1,8 +1,13 @@
 import axios from "../services/axios.ts";
 
 interface TossupData {
+    number?: string;
     tossup: string;
-    answer: string;
+    tossupAnswer: string;
+    bonus1Question: string;
+    bonus1Answer: string;
+    bonus2Question: string;
+    bonus2Answer: string;
     tournament: string;
     year: string;
 }
@@ -13,8 +18,12 @@ export const generateQuestions = async (difficulty: "Novice" | "Intermediate" | 
 
         if (response.data.success) {
             const tossupData: TossupData = {
-                tossup: response.data.data.tossup,
-                answer: response.data.data.answer,
+                tossup: response.data.data.question.tossup,
+                tossupAnswer: response.data.data.question.tossupAnswer,
+                bonus1Question: response.data.data.question.bonus1Question,
+                bonus1Answer: response.data.data.question.bonus1Answer,
+                bonus2Question: response.data.data.question.bonus2Question,
+                bonus2Answer: response.data.data.question.bonus2Answer,
                 tournament: response.data.data.tournament,
                 year: response.data.data.year
             }

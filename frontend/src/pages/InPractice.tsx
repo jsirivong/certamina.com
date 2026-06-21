@@ -10,20 +10,24 @@ interface IProps {
 }
 
 interface TossupData {
+    number?: string;
     tossup: string;
-    answer: string;
+    tossupAnswer: string;
+    bonus1Question: string;
+    bonus1Answer: string;
+    bonus2Question: string;
+    bonus2Answer: string;
     tournament: string;
     year: string;
 }
 
-type GameState = "Generating Question" | "Reading Question" | "Answering Question" | "Showing Answer";
+type GameState = "Generating Question" | "Reading Tossup" | "Answering Question" | "Showing Answer" | "Reading Bonus";
 
 export default function InPractice({ questions, difficulty, handleEndPractice, bonuses, infiniteTossups }: IProps) {
-    const tossup = useRef<string>("");
-    const answer = useRef<string>("");
     const readInterval = useRef<ReturnType<typeof setInterval> | null>(null);
     const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
+    const [tossupData, setTossupData] = useState<TossupData | null>(null);
     const [input, setInput] = useState<string>("");
     const [tossupQuestion, setTossupQuestion] = useState<number>(1);
     const [bonus, setBonus] = useState<number>(1);
@@ -33,7 +37,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
     const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
     const [showTimer, setShowTimer] = useState<boolean>(false);
     const [timer, setTimer] = useState("10");
-    const [tossupText, setTossupText] = useState<string>("");
+    const [questionText, setQuestionText] = useState<string>("");
     const [practiceState, setPracticeState] = useState<GameState | null>(null);
     const [tournament, setTournament] = useState<string>("");
     const [year, setYear] = useState<string>();
@@ -43,23 +47,27 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
 
         if (!tossupData) return;
 
-        if (tossupData.tournament && tossupData.year){
+        setTossupData(tossupData);
+
+        if (tossupData.tournament && tossupData.year) {
             setTournament(tossupData.tournament);
             setYear(tossupData.year);
         }
 
-        if (tossupData.tossup && tossupData.answer) {
-            tossup.current = tossupData.tossup;
-            answer.current = tossupData.answer;
+        setPracticeState("Reading Tossup");
+    }
+
+    const readBonus = () => {
+        if (bonus === 1) {
+            readQuestion("(B1) " + tossupData?.bonus1Question);
+        } else if (bonus === 2) {
+            readQuestion("(B2) " + tossupData?.bonus2Question);
         }
-        
-        setPracticeState("Reading Question");
-        return tossupData?.tossup
     }
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.code === "Space" && practiceState === "Reading Question") {
+            if (e.code === "Space" && (practiceState === "Reading Tossup" || practiceState === "Reading Bonus")) {
                 setPracticeState("Answering Question");
             }
         };
@@ -79,12 +87,13 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
     useEffect(() => {
         if (practiceState === "Generating Question") {
             generateTossup();
-        }
-        else if (practiceState === "Reading Question") {
-            readTossup(tossup.current);
-        } else if (practiceState == "Answering Question") {
+        } else if (practiceState === "Reading Bonus") {
+            readBonus();
+        } else if (practiceState === "Reading Tossup") {
+            readQuestion(tossupData?.tossup);
+        } else if (practiceState === "Answering Question") {
             handleBuzz();
-        } else if (practiceState == "Showing Answer") {
+        } else if (practiceState === "Showing Answer") {
             if (timerInterval.current) {
                 clearInterval(timerInterval.current)
                 timerInterval.current = null;
@@ -109,14 +118,29 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
     }
 
     const moveToNextQuestion = () => {
-        setInput("");
         setShowCorrectAnswer(false);
         setShowTextbox(false);
         setShowBuzz(true);
         setShowTimer(false);
         timerInterval.current = null;
 
-        setPracticeState("Generating Question");
+        if (bonuses){
+            if (!answeringBonus && input.toLowerCase().trim() === tossupData?.tossupAnswer.toLowerCase().trim()){
+                setAnsweringBonus(true);
+                setPracticeState("Reading Bonus");
+            } else if (answeringBonus && bonus === 1){
+                setBonus(2);
+                setPracticeState("Reading Bonus");
+            } else if (answeringBonus && bonus === 2){
+                setBonus(1);
+                setAnsweringBonus(false);
+                setPracticeState("Generating Question")
+            } else {
+                setPracticeState("Generating Question")
+            }
+        } else {
+            setPracticeState("Generating Question");
+        }
     }
 
     const handleBuzz = () => {
@@ -131,15 +155,18 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
         setPracticeState("Answering Question")
     }
 
-    const readTossup = (tossup: string) => {
-        const wordArray = tossup.split(" ");
-        setTossupText("");
+    const readQuestion = (question: string | undefined) => {
+        if (!question) return;
+
+        const wordArray = question.split(" ");
+        setQuestionText("");
+        setInput("");
 
         let index = 0;
         readInterval.current = setInterval(() => {
             if (index < wordArray.length) {
                 const currentWord = wordArray[index];
-                setTossupText((prev) => prev + (prev ? " " : "") + currentWord);
+                setQuestionText((prev) => prev + (prev ? " " : "") + currentWord);
                 index++;
             } else {
                 setPracticeState("Answering Question");
@@ -174,7 +201,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
                 )}
             </div>
             <div className="w-5xl h-auto p-12 text-left text-2xl mx-auto">
-                {tossupText}
+                {questionText}
             </div>
             {showTextbox && (
                 <div className="flex flex-col gap-y-5">
@@ -192,7 +219,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
             )}
             {practiceState === "Showing Answer" && (
                 <div className="mx-auto mt-8 flex flex-col max-w-xs gap-y-4">
-                    <p className="text-center text-lg">Answer: <span className="font-semibold">{answer.current}</span></p>
+                    <p className="text-center text-lg">Answer: <span className="font-semibold">{!answeringBonus ? tossupData?.tossupAnswer : (bonus === 1 ? tossupData?.bonus1Answer : tossupData?.bonus2Answer)}</span></p>
                     <button className="btn btn-ghost" onClick={moveToNextQuestion}>Continue {">"}</button>
                 </div>
             )}
