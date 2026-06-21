@@ -12,7 +12,8 @@ export default function Practice() {
     const [inPractice, setInPractice] = useState<boolean>(false);
     const [questions, setQuestions] = useState<number>(20);
     const [difficulty, setDifficulty] = useState<Difficulty>("Novice");
-    const [ infiniteTossups, setInfiniteTossups ] = useState<boolean>(true);
+    const [infiniteTossups, setInfiniteTossups] = useState<boolean>(true);
+    const [bonuses, setBonuses] = useState<boolean>(false);
 
     const [PDF, setPDF] = useState<File | null>(null);
     const [score, setScore] = useState<number>(Number(localStorage.getItem("score")) || 0)
@@ -68,7 +69,7 @@ export default function Practice() {
     }
 
     if (inPractice) {
-        return <InPractice questions={questions} difficulty={difficulty} infiniteTossups={infiniteTossups} handleEndPractice={handleEndPractice} />
+        return <InPractice questions={questions} difficulty={difficulty} infiniteTossups={infiniteTossups} bonuses={bonuses} handleEndPractice={handleEndPractice} />
     }
 
     return (
@@ -90,6 +91,10 @@ export default function Practice() {
                         <div className="flex flex-row gap-x-5">
                             <label className="label">Infinite tossups</label>
                             <input className="checkbox border-2 rounded-none" type="checkbox" checked={infiniteTossups} onChange={(e) => setInfiniteTossups(e.target.checked)}/>
+                        </div>
+                        <div className="flex flex-row gap-x-5">
+                            <label className="label">Bonuses</label>
+                            <input className="checkbox border-2 rounded-none" type="checkbox" checked={bonuses} onChange={(e) => setBonuses(e.target.checked)}/>
                         </div>
                         <div className="dropdown">
                             <label className="label mx-5">Difficulty</label>

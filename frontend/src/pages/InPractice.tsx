@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "../services/axios.ts";
 import { generateQuestions } from "../util/generate-question.ts";
 
 interface IProps {
     questions?: number;
     difficulty: "Novice" | "Intermediate" | "Advanced";
+    bonuses?: boolean;
     infiniteTossups?: boolean | undefined;
     handleEndPractice: () => void;
 }
@@ -18,7 +18,7 @@ interface TossupData {
 
 type GameState = "Generating Question" | "Reading Question" | "Answering Question" | "Showing Answer";
 
-export default function InPractice({ questions, difficulty, handleEndPractice, infiniteTossups }: IProps) {
+export default function InPractice({ questions, difficulty, handleEndPractice, bonuses, infiniteTossups }: IProps) {
     const tossup = useRef<string>("");
     const answer = useRef<string>("");
     const readInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -39,7 +39,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, i
     const [year, setYear] = useState<string>();
 
     const generateTossup = async (): Promise<string | undefined> => {
-        const tossupData: TossupData | undefined = await generateQuestions("novice", 1);
+        const tossupData: TossupData | undefined = await generateQuestions(difficulty, 1);
 
         if (!tossupData) return;
 
@@ -59,7 +59,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, i
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.code === "Space") {
+            if (e.code === "Space" && practiceState === "Reading Question") {
                 setPracticeState("Answering Question");
             }
         };
@@ -70,7 +70,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, i
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, []);
+    }, [practiceState]);
 
     useEffect(() => {
         setPracticeState("Generating Question");
@@ -147,7 +147,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, i
                     clearInterval(readInterval.current);
                 }
             }
-        }, 1000);
+        }, 300);
     }
 
     return (
@@ -163,7 +163,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, i
             )}
             <div className="mx-auto max-w-5xl flex flex-row justify-center gap-5 relative top-0 my-5">
                 <h4 className="text-md font-semibold text-center w-20">{difficulty}</h4>
-                <h4 className="text-md font-semibold text-center w-20">{tournament} {year}</h4>
+                <h4 className="text-md font-semibold text-center w-30">{tournament} {year}</h4>
                 {!infiniteTossups && (
                     <>
                         <h4 className="text-mid font-semibold text-center w-25">Toss Up {tossupQuestion}/{questions}</h4>

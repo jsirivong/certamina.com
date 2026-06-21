@@ -2,13 +2,10 @@ import { Link, useNavigate } from "react-router";
 import { useLocation } from "react-router";
 import { useThemeStore } from "../store/useThemeStore";
 import { MenuIcon } from 'lucide-react';
-import { useState } from "react";
-import PageLoading from "./PageLoading";
-import axios from "../services/axios";
 
 interface IProps {
     isAuthenticated?: boolean;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     username?: string | undefined;
     handleLogout?: () => void;
     loading?: boolean | undefined;
@@ -33,8 +30,6 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                     <div className="flex items-center justify-end md:gap-10 gap-4 px-10">
                         <>
                             <div className="gap-3 lg:block hidden">
-                                <a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/contact" && "border-b-purple-500 border-b-3"}`} href="/contact">Contact</a>
-                                <a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/about" && "border-b-purple-500 border-b-3"}`} href="/about">About</a>
                                 <a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/donate" && "border-b-purple-500 border-b-3"}`} href="/donate">Donate</a>
                                 <div className="dropdown">
                                     <button tabIndex={0} role="button" className="btn btn-ghost rounded-none tracking-wider ">Play</button>
@@ -104,8 +99,6 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                     <MenuIcon/>
                                 </div>
                                 <ul className="menu menu-md dropdown-content bg-base-100 rounded-box z-1 mt-3 md:w-52 w-40 p-2 shadow" tabIndex={0}>
-                                    <li><a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/contact" && "border-b-purple-500 border-b-3"}`} href="/contact">Contact</a></li>
-                                    <li><a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/about" && "border-b-purple-500 border-b-3"}`} href="/about">About</a></li>
                                     <li><a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/donate" && "border-b-purple-500 border-b-3"}`} href="/donate">Donate</a></li>
                                     <li><div className="dropdown dropdown-center">
                                         <button tabIndex={0} role="button" className="btn btn-ghost w-full p-0 m-0 rounded-none tracking-wider ">Play</button>

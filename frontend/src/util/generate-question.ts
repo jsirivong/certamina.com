@@ -7,9 +7,9 @@ interface TossupData {
     year: string;
 }
 
-export const generateQuestions = async (difficulty: "novice" | "intermediate" | "advanced", numberOfQuestions: number) => {
+export const generateQuestions = async (difficulty: "Novice" | "Intermediate" | "Advanced", numberOfQuestions: number) => {
     try {
-        const response = await axios.post("/questions/generate-questions", { difficulty: difficulty, number: numberOfQuestions });
+        const response = await axios.post("/questions/generate-questions", { difficulty: difficulty.toLowerCase(), number: numberOfQuestions });
 
         if (response.data.success) {
             const tossupData: TossupData = {
