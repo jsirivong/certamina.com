@@ -8,7 +8,7 @@ import type AuthorizedUserRequest from '../types/AuthorizedUserRequest.ts';
 
 export const authorizeUser = async (req: AuthorizedUserRequest, res: Response, next: NextFunction) => {
     try {
-        const token = req.cookies.token;
+        const { token } = req.cookies;
 
         if (!token) return res.status(401).json({ success: false, message: "Token does not exist." });
 
@@ -16,7 +16,7 @@ export const authorizeUser = async (req: AuthorizedUserRequest, res: Response, n
             throw new Error("JWT_SECRET_KEY is not defined in environment variables.");
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) as JwtPayload;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         if (!decoded?.sub) {
             return res.status(401).json({ success: false, message: "Token is not valid." });
@@ -27,6 +27,7 @@ export const authorizeUser = async (req: AuthorizedUserRequest, res: Response, n
         if (!user) return res.status(401).json({success: false, message: "User not found in database."});
 
         req.user = user;
+        req.authenticated = true;
 
         next();
     } catch (err) {

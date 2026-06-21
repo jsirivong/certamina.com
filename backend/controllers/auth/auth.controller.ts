@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
             secure: process.env.NODE_ENV === "production",
             httpOnly: process.env.NODE_ENV === "production", // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         res.status(200).json({ success: true, user: user })
@@ -123,9 +123,9 @@ export const register = async (req: Request, res: Response) => {
 
         res.cookie("token", token, {
             secure: process.env.NODE_ENV === "production",
-            httpOnly: process.env.NODE_ENV === "production", // only in development, true for production
+            httpOnly: process.env.NODE_ENV !== "production", // only in development, true for production
             maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
-            sameSite: "none", // "strict" stops XSS attacks (cross-site scripting)
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // "strict" stops XSS attacks (cross-site scripting)
         })
 
         return res.status(201).json({ success: true, user: user })

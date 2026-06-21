@@ -1,92 +1,129 @@
-// import type { Response } from 'express'
-// import { redis } from '../services/redis.ts';
-// import { generateRoomCode } from '../utils/generatecode.ts';
-// import type AuthorizedUserRequest from '../types/AuthorizedUserRequest.ts';
+import type { Request, Response } from 'express'
+import redis from '../services/redis.ts';
+import type { Socket, Server } from 'socket.io';
 
-// interface RoomState {
-//     hostId: string;
-//     currentQuestion: number;
-//     created_at: Date;
-// }
+export interface Player {
+    id: string;
+    username: string;
+    score: number;
+    profile_picture?: string;
+    joined_at?: number;
+    socket_id?: string;
+}
 
-// interface Team {
-//     id: string;
-//     name: string;
-//     score: string;
-// }
+export interface RoomData {
+    code: string;
+    hostId: string;
+    players: Player[];
+    status: "waiting" | "in_progress" | "ended";
+    currentQuestion: number;
+    created_at?: number;
+}
 
-// const SECONDS_TILL_EXPIRE = 60 * 60
+const generateCode = (): string => {
+    let code = "";
 
-// export const createRoom = async (req: AuthorizedUserRequest, res: Response) => {
-//     try {
-//         const { hostId } = req.cookies.token
-//         const roomCode = generateRoomCode();
+    for (let i = 0; i < 6; i++) {
+        const randNum = Math.floor(Math.random() * 9);
 
-//         await redis.hset(`room:${roomCode}`, {
-//             // room metadata
-//             hostId,
-//             currentQuestion: 0,
-//             created_at: Date.now()
-//         })
+        code += randNum;
+    }
 
-//         for (let i = 1; i <= 3; i++) {
-//             await redis.hset(`room:${roomCode}:team:${i}`, {
-//                 id: i,
-//                 name: `Team ${i}`,
-//                 score: 0,
-//             });
-//             await redis.sadd(`room:${roomCode}:team:${i}:players`)
-//             await redis.sadd(`room:${roomCode}:teams`, i);
-//         }
+    return code
+}
 
-//         await Promise.all([
-//             // adds an expiration to room key-value pair
-//             redis.expire(`room:${roomCode}`, SECONDS_TILL_EXPIRE),
-//             redis.expire(`room:${roomCode}:teams`, SECONDS_TILL_EXPIRE)
-//         ]);
+export const checkIfRoomExists = async (req: Request, res: Response) => {
+    const { code } = req.params;
 
-//         res.status(201).json({ success: true, message: `Room ${roomCode} successfully created.` })
-//     } catch (err: any) {
-//         console.log("Error in creating room.\n", err)
-//         res.status(500).json({ success: false, message: "Server failed creating room." });
-//     }
-// }
+    if (!code) {
+        return res.json({ success: false, message: "Please enter a valid code." });
+    }
 
-// export const joinRoom = async (req: AuthorizedUserRequest, res: Response) => {
-//     try {
-//         const { code } = req.params;
+    const gameExists = (await redis.get(`room:${code}`)) !== null;
 
-//         if (!await redis.exists(`room:${code}`)) return res.status(400).json({ success: false, message: "Room not found." });
-//         if (!req.user) return res.status(400).json({ success: false, message: "User not found." });
+    res.json({ success: true, exists: gameExists })
+}
 
-//         const teamIds = await redis.smembers(`room:${code}:teams`);
+export const createRoom = async (socket: Socket, callback: Function) => {
+    try {
+        const generatedCode = generateCode();
 
-//         // assign user to the team with lowest members
-//         let lowestPlayerCountTeam: Record<string, string> | null = null;
-//         let lowestPlayerCount = Infinity;
+        const host: Player = {
+            id: socket.id,
+            socket_id: socket.id,
+            username: "dasjfad",
+            score: 0,
+            joined_at: Date.now()
+        }
 
-//         for (const teamId of teamIds) {
-//             const team = await redis.hgetall(`room:${code}:team:${teamId}`);
-//             const playerCount = await redis.scard(`room:${code}:team:${teamId}:players`)
-//             const players = await redis.smembers(`room:${code}:team:${teamId}:players`)
+        const roomData: RoomData = {
+            code: generatedCode,
+            hostId: socket.id,
+            players: [host],
+            status: "waiting",
+            created_at: Date.now(),
+            currentQuestion: 0
+        }
 
-//             if (playerCount < lowestPlayerCount){
-//                 lowestPlayerCount = playerCount;
-//                 lowestPlayerCountTeam = team;
-//             }
-//         }
+        await redis.setex(`room:${generatedCode}`, 3600, JSON.stringify(roomData));
 
-//         await redis.sadd(`room:${code}:team:${lowestPlayerCountTeam?.id}:players`, req.user?.username)
+        socket.join(`room:${generatedCode}`);
 
-//         Promise.all([
-//             redis.expire(`room:${code}:team:1:players`, SECONDS_TILL_EXPIRE),
-//             redis.expire(`room:${code}:team:2:players`, SECONDS_TILL_EXPIRE),
-//             redis.expire(`room:${code}:team:3:players`, SECONDS_TILL_EXPIRE),
-//         ]);
+        callback({ success: true, code: generatedCode, username: host.username});
+    } catch (e: any) {
+        console.log("Error in creating room.");
+    }
+}
 
-//         res.status(201).json({ success: true, code: code, message: `Successfully joined room ${code}.` })
-//     } catch (err: any) {
-//         console.log("Error in joining room.\n", err)
-//         res.status(500).json({ success: false, message: "Server failed joining room." });
-//     }
-// }
+export const joinRoom = async (socket: Socket, data: {code: string, username: string}, callback: Function) => {
+    try {
+        socket.join(`room${data.code}`);
+
+        const roomJSON = await redis.get(`room:${data.code}`);
+
+        if (!roomJSON) {
+            return callback({success: false, error: "Room not found."});
+        }
+
+        const roomData: RoomData = JSON.parse(roomJSON);
+
+        if (roomData.status !== "waiting"){
+            return callback({success: false, error: "Game has already started."});
+        }
+
+        const usernameTaken = roomData.players.some((p) => p.username === data.username);
+        if (usernameTaken){
+            return callback({success: false, error: "Username is already taken."});
+        }
+
+        const player: Player = {
+            id: socket.id,
+            username: data.username,
+            socket_id: socket.id,
+            score: 0,
+            joined_at: Date.now()
+        }
+
+        roomData.players.push(player);
+
+        socket.emit("join-room", {room: roomData, code: data.code})
+
+        await redis.setex(`room:${data.code}`, 3600, JSON.stringify(roomData));
+
+        callback({success: true, room: roomData, player})
+    } catch (err: any) {
+        console.log("Error in joining room.");
+    }
+}
+
+export const deleteRoom = async (socket: Socket, data: {code: string}) => {
+    try {
+        socket.to(`room:${data.code}`).emit("delete-room");
+
+        socket.in(`room:${data.code}`).socketsLeave(`room:${data.code}`);
+
+        await redis.del(`room:${data.code}`);
+    } catch (err: any){
+        console.log("Error deleting room: ", err);
+    }
+}

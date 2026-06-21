@@ -1,11 +1,12 @@
-// import express from 'express'
-// import { createRoom, joinRoom } from '../controllers/room.controller.ts';
+import express from 'express'
+import { checkIfRoomExists } from '../controllers/room.controller.ts';
 // import { authorizeUser } from '../middleware/authorization.ts';
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post("/", authorizeUser, createRoom);
-// router.post("/:code/join", authorizeUser, joinRoom)
+// router.post("/create", createRoom)
+router.post("/status/:code", checkIfRoomExists)
+// router.post("/join/:code", joinRoom)
 
-// export default router;
+export default router;
 
