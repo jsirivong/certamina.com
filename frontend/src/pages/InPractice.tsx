@@ -6,6 +6,7 @@ interface IProps {
     difficulty: "Novice" | "Intermediate" | "Advanced";
     bonuses?: boolean;
     infiniteTossups?: boolean | undefined;
+    readingSpeed?: number;
     handleEndPractice: () => void;
 }
 
@@ -23,7 +24,7 @@ interface TossupData {
 
 type GameState = "Generating Question" | "Reading Tossup" | "Answering Question" | "Showing Answer" | "Reading Bonus";
 
-export default function InPractice({ questions, difficulty, handleEndPractice, bonuses, infiniteTossups }: IProps) {
+export default function InPractice({ questions, difficulty, handleEndPractice, bonuses, infiniteTossups, readingSpeed }: IProps) {
     const readInterval = useRef<ReturnType<typeof setInterval> | null>(null);
     const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -174,7 +175,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
                     clearInterval(readInterval.current);
                 }
             }
-        }, 300);
+        }, readingSpeed);
     }
 
     return (

@@ -14,6 +14,8 @@ export default function Practice() {
     const [difficulty, setDifficulty] = useState<Difficulty>("Novice");
     const [infiniteTossups, setInfiniteTossups] = useState<boolean>(true);
     const [bonuses, setBonuses] = useState<boolean>(false);
+    const [readingSpeed, setReadingSpeed] = useState(500);
+    const [keepScore, setKeepScore] = useState<boolean>(false);
 
     const [PDF, setPDF] = useState<File | null>(null);
     const [score, setScore] = useState<number>(Number(localStorage.getItem("score")) || 0)
@@ -69,7 +71,7 @@ export default function Practice() {
     }
 
     if (inPractice) {
-        return <InPractice questions={questions} difficulty={difficulty} infiniteTossups={infiniteTossups} bonuses={bonuses} handleEndPractice={handleEndPractice} />
+        return <InPractice questions={questions} difficulty={difficulty} infiniteTossups={infiniteTossups} bonuses={bonuses} handleEndPractice={handleEndPractice} readingSpeed={readingSpeed} />
     }
 
     return (
@@ -89,12 +91,21 @@ export default function Practice() {
                             </label>
                         </div>
                         <div className="flex flex-row gap-x-5">
+                            <label className="label">Keep Score</label>
+                            <input disabled={infiniteTossups} className="checkbox border-2 rounded-none" type="checkbox" checked={keepScore} onChange={(e) => setKeepScore(e.target.checked)}/>
+                        </div>
+                        <div className="flex flex-row gap-x-5">
                             <label className="label">Infinite tossups</label>
                             <input className="checkbox border-2 rounded-none" type="checkbox" checked={infiniteTossups} onChange={(e) => setInfiniteTossups(e.target.checked)}/>
                         </div>
                         <div className="flex flex-row gap-x-5">
                             <label className="label">Bonuses</label>
                             <input className="checkbox border-2 rounded-none" type="checkbox" checked={bonuses} onChange={(e) => setBonuses(e.target.checked)}/>
+                        </div>
+                        <div className="flex flex-row gap-x-5">
+                            <label className="label">Reading Speed</label>
+                            <input type="range" min="100" max="2000" className="range range-neutral" value={readingSpeed} onChange={(e) => setReadingSpeed(Number(e.target.value))}/>
+                            <label className="label">{readingSpeed}</label>
                         </div>
                         <div className="dropdown">
                             <label className="label mx-5">Difficulty</label>

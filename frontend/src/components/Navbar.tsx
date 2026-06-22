@@ -30,13 +30,13 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                     <div className="flex items-center justify-end md:gap-10 gap-4 px-10">
                         <>
                             <div className="gap-3 lg:block hidden">
-                                <a className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/donate" && "border-b-purple-500 border-b-3"}`} href="/donate">Donate</a>
+                                <Link className={`btn btn-ghost rounded-none tracking-wider ${pathname === "/donate" && "border-b-purple-500 border-b-3"}`} to="/donate">Donate</Link>
                                 <div className="dropdown">
                                     <button tabIndex={0} role="button" className="btn btn-ghost rounded-none tracking-wider ">Play</button>
 
                                     <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-38 p-2 shadow-sm font-semibold tracking-wider">
-                                        <li><a href="/practice">Practice</a></li>
-                                        <li><a href="/join">Join</a></li>
+                                        <li><Link to="/practice">Practice</Link></li>
+                                        <li><Link to="/join">Join</Link></li>
                                         <li><a onClick={() => {
                                             if (!isAuthenticated){
                                                 return navigate("/login");
@@ -104,9 +104,9 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                                         <button tabIndex={0} role="button" className="btn btn-ghost w-full p-0 m-0 rounded-none tracking-wider ">Play</button>
 
                                         <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                                            <li><a href="/practice">Practice</a></li>
-                                            <li><a href="/join">Join</a></li>
-                                            <li><a href="/room">Host</a></li>
+                                            <li><Link to="/practice">Practice</Link></li>
+                                            <li><Link to="/join">Join</Link></li>
+                                            <li><Link to="/host">Host</Link></li>
                                         </ul>
                                     </div></li>
                                 </ul>
