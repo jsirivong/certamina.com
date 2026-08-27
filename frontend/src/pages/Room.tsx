@@ -71,11 +71,11 @@ export default function Room() {
     const { user } = useAuthentication();
 
     useEffect(() => {
-        if (!role){
+        if (!role) {
             return;
         }
 
-        if (role === "player"){
+        if (role === "player") {
             setTeams(state?.room.teams);
             setRoomCode(state?.room.code);
         }
@@ -109,7 +109,24 @@ export default function Room() {
                     const response = await axios.get(`/room/status/${roomCode}`);
 
                     if (response.data.success && response.data.room) {
-                        setTeams(response.data.room.teams);
+                        let totalAmountOfPlayers: number = 0;
+
+                        response.data.room.teams.forEach((team: Team) => {
+                            totalAmountOfPlayers += team.players.length;
+                        })
+
+                        if (totalAmountOfPlayers > 1) {
+                            setTeams(response.data.room.teams);
+                        } else {
+                            sessionStorage.removeItem("roomcode");
+                            socket.emit("create-room", user, (response: any) => {
+                                if (response.success) {
+                                    setRoomCode(response.code);
+                                    setTeams(response.teams);
+                                    sessionStorage.setItem("roomcode", response.code);
+                                };
+                            });
+                        }
                     }
                 } catch (err: any) {
                     console.log(err);
@@ -132,6 +149,10 @@ export default function Room() {
 
             setTeams(data.room.teams);
             sessionStorage.setItem("roomcode", data.room.code);
+        })
+        
+        socket.on("connect", () => {
+            socket.emit("rejoin-room", sessionStorage.getItem("username"));
         })
 
         socket.on("leave-room", (room: RoomData) => {
