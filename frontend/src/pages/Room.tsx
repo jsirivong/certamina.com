@@ -71,9 +71,13 @@ export default function Room() {
     const { user } = useAuthentication();
 
     useEffect(() => {
-        if (!role) {
-            console.log("Player does not have a role.");
-            navigate("/");
+        if (!role){
+            return;
+        }
+
+        if (role === "player"){
+            setTeams(state?.room.teams);
+            setRoomCode(state?.room.code);
         }
     }, [role, navigate, state])
 
@@ -130,11 +134,14 @@ export default function Room() {
             sessionStorage.setItem("roomcode", data.room.code);
         })
 
+        socket.on("leave-room", (room: RoomData) => {
+            setTeams(room.teams);
+        })
+
         return () => {
             socket.off("chat-message");
             socket.off("create-room");
             socket.off("join-room");
-            socket.emit("leave-room");
         }
     }, [])
 

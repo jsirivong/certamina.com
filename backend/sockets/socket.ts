@@ -1,5 +1,5 @@
 import { Server, type Socket } from 'socket.io'
-import { createRoom, joinRoom, deleteRoom } from '../controllers/room.controller.ts';
+import { createRoom, joinRoom, deleteRoom, leaveRoom } from '../controllers/room.controller.ts';
 import redis from '../services/redis.ts';
 
 import type { RoomData, Player, Team } from '../controllers/room.controller.ts';
@@ -19,6 +19,10 @@ export const initializeSocketIOServer = (io: Server) => {
 
         socket.on("delete-room", (data) => {
             deleteRoom(socket, data);
+        })
+
+        socket.on("leave-room", (roomCode: string) => {
+            leaveRoom(socket, io, roomCode)
         })
 
         socket.on("chat-message", async (data) => {
@@ -56,6 +60,7 @@ export const initializeSocketIOServer = (io: Server) => {
 
         socket.on("disconnect", async () => {
             console.log(`Websocket '${socket.id}' disconnected.`);
+            leaveRoom(socket, io, socket.data.roomCode);
 
             // try {
             //     const keys = await redis.keys(`room:*`);

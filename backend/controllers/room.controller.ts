@@ -56,9 +56,9 @@ export const checkIfRoomExists = async (req: Request, res: Response) => {
         const room: RoomData = JSON.parse(roomJSON);
 
         res.status(200).json({ success: true, room: room })
-    } catch (err: any){
+    } catch (err: any) {
         console.log(err);
-        return res.status(500).json({success: false, message: "Internal server error."});
+        return res.status(500).json({ success: false, message: "Internal server error." });
     }
 }
 
@@ -100,6 +100,7 @@ export const createRoom = async (socket: Socket, user: { email: string, username
 export const joinRoom = async (socket: Socket, io: Server, data: { code: string, username: string }, callback: Function) => {
     try {
         socket.join(`room:${data.code}`);
+        socket.data.roomCode = data.code;
 
         const roomJSON = await redis.get(`room:${data.code}`);
 
@@ -154,5 +155,35 @@ export const deleteRoom = async (socket: Socket, data: { code: string }) => {
         await redis.del(`room:${data.code}`);
     } catch (err: any) {
         console.log("Error deleting room: ", err);
+    }
+}
+
+export const leaveRoom = async (socket: Socket, io: Server, roomCode: string) => {
+    try {
+        if (!roomCode) {
+            return console.error("Room code was not passed in.");
+        }
+
+        const roomJSON = await redis.get(`room:${roomCode}`);
+
+        if (!roomJSON) {
+            return console.error("Room does not exist.");
+        }
+
+        const roomData: RoomData = JSON.parse(roomJSON);
+
+        if (roomData) {
+            roomData.teams.forEach((team: Team) => {
+                const updatedPlayers = team.players.filter((player: Player) => player.socket_id !== socket.id);
+                team.players = updatedPlayers;
+            })
+
+            await redis.set(`room:${roomCode}`, JSON.stringify(roomData));
+        }
+
+        io.to(`room:${roomCode}`).emit("leave-room", roomData);
+        socket.leave(`room:${roomCode}`);
+    } catch (err: any) {
+        console.log("Error leaving room: ", err);
     }
 }
