@@ -158,6 +158,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
 
     const readQuestion = (question: string | undefined) => {
         if (!question) return;
+        if (!readingSpeed) return;
 
         const wordArray = question.split(" ");
         setQuestionText("");
@@ -175,7 +176,7 @@ export default function InPractice({ questions, difficulty, handleEndPractice, b
                     clearInterval(readInterval.current);
                 }
             }
-        }, readingSpeed);
+        }, 60000/readingSpeed);
     }
 
     return (

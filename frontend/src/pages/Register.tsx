@@ -84,7 +84,7 @@ export default function Register() {
                         <div className="divider">OR</div>
 
                         {/* Google Auth */}
-                        <div>
+                        <div className="g-signin2" data-onsuccess="onSignIn">
                             <button className="btn w-full">
                                 <>
                                     <img src="/google.png" alt="Google Sign-In" className="size-5" />

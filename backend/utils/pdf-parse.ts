@@ -1,4 +1,3 @@
-import path from 'path';
 import * as PDFJS from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export async function pdfParse(school: string, year: number, difficulty: "novice" | "intermediate" | "advanced", pdfBuffer?: ArrayBuffer): Promise<any> {
@@ -22,7 +21,7 @@ export async function pdfParse(school: string, year: number, difficulty: "novice
         }
     }
 
-    return fullText
+    return fullText;
 }
 
 async function extractTextFromPage(page: PDFJS.PDFPageProxy): Promise<string> {

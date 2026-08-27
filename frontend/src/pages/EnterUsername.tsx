@@ -33,7 +33,7 @@ export default function EnterUsername() {
 
             socket.emit("join-room", {code: searchParams.get("code"), username: username}, (response: any) => {
                 if (response.success){
-                    navigate("/room", {state: {role: "player", players: response.room.players}});
+                    navigate("/room", {state: {role: "player", room: response.room}});
                 }
             });
         } catch (err: any){

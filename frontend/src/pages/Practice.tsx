@@ -14,7 +14,7 @@ export default function Practice() {
     const [difficulty, setDifficulty] = useState<Difficulty>("Novice");
     const [infiniteTossups, setInfiniteTossups] = useState<boolean>(true);
     const [bonuses, setBonuses] = useState<boolean>(false);
-    const [readingSpeed, setReadingSpeed] = useState(500);
+    const [readingSpeed, setReadingSpeed] = useState(150); // wpm
     const [keepScore, setKeepScore] = useState<boolean>(false);
 
     const [PDF, setPDF] = useState<File | null>(null);
@@ -103,8 +103,8 @@ export default function Practice() {
                             <input className="checkbox border-2 rounded-none" type="checkbox" checked={bonuses} onChange={(e) => setBonuses(e.target.checked)}/>
                         </div>
                         <div className="flex flex-row gap-x-5">
-                            <label className="label">Reading Speed</label>
-                            <input type="range" min="100" max="2000" className="range range-neutral" value={readingSpeed} onChange={(e) => setReadingSpeed(Number(e.target.value))}/>
+                            <label className="label">Reading Speed (WPM)</label>
+                            <input type="range" min="25" max="600" className="range range-neutral" value={readingSpeed} onChange={(e) => setReadingSpeed(Number(e.target.value))}/>
                             <label className="label">{readingSpeed}</label>
                         </div>
                         <div className="dropdown">

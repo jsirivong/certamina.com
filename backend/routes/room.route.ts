@@ -5,7 +5,7 @@ import { checkIfRoomExists } from '../controllers/room.controller.ts';
 const router = express.Router();
 
 // router.post("/create", createRoom)
-router.post("/status/:code", checkIfRoomExists)
+router.get("/status/:code", checkIfRoomExists)
 // router.post("/join/:code", joinRoom)
 
 export default router;

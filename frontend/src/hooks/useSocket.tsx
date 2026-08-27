@@ -1,29 +1,30 @@
 import { useState, useEffect } from "react";
-import { io, type Socket} from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
+import socket from "../services/socket";
 
-export default function useSocket(){
-    const [socket, setSocket] = useState<Socket | null>(null);
+export default function useSocket() {
     const [connected, setConnected] = useState<boolean>(false);
 
-    useEffect(()=>{
-        const newSocket = io(import.meta.env.VITE_DEV_SOCKET_URL);
+    useEffect(() => {
+        socket?.connect();
+
+        if (socket.connected){
+            setConnected(true);
+        }
         
-        newSocket.on("connect", () => {
-            console.log("Socket is connected.");
+        socket?.on("connect", () => {
             setConnected(true);
         })
 
-        newSocket.on("disconnect", () => {
-            console.log("Socket disconnected.");
+        socket?.on("disconnect", () => {
             setConnected(false);
         })
 
-        setSocket(newSocket);
-
         return () => {
-            newSocket.close();
+            socket?.off("connect");
+            socket?.off("disconnect");
         }
-    }, [])
+    }, []);
 
     return { socket, connected }
 }

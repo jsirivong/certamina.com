@@ -2,6 +2,13 @@ import type { Request, Response } from 'express'
 import redis from '../services/redis.ts';
 import type { Socket, Server } from 'socket.io';
 
+export interface Team {
+    id: number;
+    name?: string;
+    numberOfPlayers?: number;
+    players: Player[];
+}
+
 export interface Player {
     id: string;
     username: string;
@@ -14,7 +21,7 @@ export interface Player {
 export interface RoomData {
     code: string;
     hostId: string;
-    players: Player[];
+    teams: Team[];
     status: "waiting" | "in_progress" | "ended";
     currentQuestion: number;
     created_at?: number;
@@ -35,23 +42,34 @@ const generateCode = (): string => {
 export const checkIfRoomExists = async (req: Request, res: Response) => {
     const { code } = req.params;
 
-    if (!code) {
-        return res.json({ success: false, message: "Please enter a valid code." });
+    try {
+        if (!code) {
+            return res.status(400).json({ success: false, message: "Please enter a valid code." });
+        }
+
+        const roomJSON = await redis.get(`room:${code}`);
+
+        if (!roomJSON) {
+            return res.status(404).json({ success: false, message: "Room not found." });
+        }
+
+        const room: RoomData = JSON.parse(roomJSON);
+
+        res.status(200).json({ success: true, room: room })
+    } catch (err: any){
+        console.log(err);
+        return res.status(500).json({success: false, message: "Internal server error."});
     }
-
-    const gameExists = (await redis.get(`room:${code}`)) !== null;
-
-    res.json({ success: true, exists: gameExists })
 }
 
-export const createRoom = async (socket: Socket, callback: Function) => {
+export const createRoom = async (socket: Socket, user: { email: string, username: string }, callback: Function) => {
     try {
         const generatedCode = generateCode();
 
         const host: Player = {
             id: socket.id,
             socket_id: socket.id,
-            username: "dasjfad",
+            username: user.username,
             score: 0,
             joined_at: Date.now()
         }
@@ -59,7 +77,11 @@ export const createRoom = async (socket: Socket, callback: Function) => {
         const roomData: RoomData = {
             code: generatedCode,
             hostId: socket.id,
-            players: [host],
+            teams: [
+                { id: 1, name: "Team 1", players: [host] },
+                { id: 2, name: "Team 2", players: [] },
+                { id: 3, name: "Team 3", players: [] },
+            ],
             status: "waiting",
             created_at: Date.now(),
             currentQuestion: 0
@@ -69,32 +91,35 @@ export const createRoom = async (socket: Socket, callback: Function) => {
 
         socket.join(`room:${generatedCode}`);
 
-        callback({ success: true, code: generatedCode, username: host.username});
+        callback({ success: true, code: generatedCode, teams: roomData.teams });
     } catch (e: any) {
         console.log("Error in creating room.");
     }
 }
 
-export const joinRoom = async (socket: Socket, data: {code: string, username: string}, callback: Function) => {
+export const joinRoom = async (socket: Socket, io: Server, data: { code: string, username: string }, callback: Function) => {
     try {
-        socket.join(`room${data.code}`);
+        socket.join(`room:${data.code}`);
 
         const roomJSON = await redis.get(`room:${data.code}`);
 
         if (!roomJSON) {
-            return callback({success: false, error: "Room not found."});
+            return callback({ success: false, error: "Room not found." });
         }
 
         const roomData: RoomData = JSON.parse(roomJSON);
 
-        if (roomData.status !== "waiting"){
-            return callback({success: false, error: "Game has already started."});
+        if (roomData.status !== "waiting") {
+            return callback({ success: false, error: "Game has already started." });
         }
 
-        const usernameTaken = roomData.players.some((p) => p.username === data.username);
-        if (usernameTaken){
-            return callback({success: false, error: "Username is already taken."});
-        }
+        roomData.teams.forEach((team: Team) => {
+            team.players.forEach((player: Player) => {
+                if (player.username === data.username) {
+                    return callback({ success: false, error: "Username is already taken." });
+                }
+            })
+        })
 
         const player: Player = {
             id: socket.id,
@@ -104,26 +129,30 @@ export const joinRoom = async (socket: Socket, data: {code: string, username: st
             joined_at: Date.now()
         }
 
-        roomData.players.push(player);
+        const smallestTeam = roomData.teams.reduce((prev, curr) =>
+            prev.players.length <= curr.players.length ? prev : curr
+        );
 
-        socket.emit("join-room", {room: roomData, code: data.code})
+        smallestTeam.players.push(player);
+
+        io.to(`room:${data.code}`).emit("join-room", { room: roomData });
 
         await redis.setex(`room:${data.code}`, 3600, JSON.stringify(roomData));
 
-        callback({success: true, room: roomData, player})
+        callback({ success: true, room: roomData, player })
     } catch (err: any) {
         console.log("Error in joining room.");
     }
 }
 
-export const deleteRoom = async (socket: Socket, data: {code: string}) => {
+export const deleteRoom = async (socket: Socket, data: { code: string }) => {
     try {
         socket.to(`room:${data.code}`).emit("delete-room");
 
         socket.in(`room:${data.code}`).socketsLeave(`room:${data.code}`);
 
         await redis.del(`room:${data.code}`);
-    } catch (err: any){
+    } catch (err: any) {
         console.log("Error deleting room: ", err);
     }
 }

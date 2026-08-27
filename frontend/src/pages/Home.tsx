@@ -25,7 +25,7 @@ export default function Home() {
                     <div className="max-w-[70vw] flex flex-col space-y-6 mx-auto justify-center">
                         <h2 className="font-bold text-3xl lg:text-5xl text-purple-600">Set up a game in seconds</h2>
                         <p className="text-md font-semibold">Host a competitive, real-like game of Certamen in just a few seconds with a maximum of 12 people.</p>
-                        <button className="btn btn-soft w-full" onClick={() => navigate("/host")}>Host {">"}</button>
+                        <button className="btn btn-soft w-full" onClick={() => navigate("/room")}>Host {">"}</button>
                     </div>
                 </div>
 

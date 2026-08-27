@@ -34,7 +34,7 @@ const TOURNAMENTS: Tournament[] = [
     {
         tournament: "nationals",
         years: [
-            2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010
+            2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2014, 2013, 2012, 2011, 2010
         ]
     }
 ]
@@ -87,7 +87,7 @@ export const generateQuestions = async (req: Request, res: Response) => {
 
         const randQuestion: Question = questions[Math.floor(Math.random() * questions.length)];
 
-        res.status(200).json({ success: true, data: { tossup: randQuestion.tossup, answer: randQuestion.tossupAnswer, tournament: randomTournament.tournament[0].toUpperCase() + randomTournament.tournament.substring(1), year: randomYear}})
+        res.status(200).json({ success: true, data: { question: randQuestion, tournament: randomTournament.tournament[0].toUpperCase() + randomTournament.tournament.substring(1), year: randomYear}})
     } catch (err: any) {
         console.log("Error generating questions.", err);
         res.status(500).json({ success: false, message: "Internal server error." });

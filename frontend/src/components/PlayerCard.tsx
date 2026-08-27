@@ -1,5 +1,5 @@
 interface IProps {
-    username: string;
+    username: string | undefined;
     profile_picture?: string;
 }
 

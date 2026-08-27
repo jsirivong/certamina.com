@@ -16,9 +16,9 @@ export default function Join() {
         
         try {
             setLoading(true);
-            const response = await axios.post(`/room/status/${code}`);
+            const response = await axios.get(`/room/status/${code}`);
 
-            if (response.data.exists){
+            if (response.data.room){
                 navigate(`/username?code=${code}`);
             }
         } catch (e: any){

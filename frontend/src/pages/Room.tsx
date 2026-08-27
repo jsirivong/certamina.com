@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, Send } from "lucide-react";
 import PlayerCard from "../components/PlayerCard";
-import PlayerList from "../components/PlayerList";
 import axios from "../services/axios";
 import { useNavigate } from "react-router";
 import PageLoading from "../components/PageLoading";
 import useSocket from "../hooks/useSocket";
 import { useLocation } from "react-router";
+import useAuthentication from "../hooks/useAuthentication";
 
 type Difficulty = "Novice" | "Intermediate" | "Advanced";
 
@@ -20,7 +20,7 @@ interface Message {
 
 export interface Player {
     id?: string;
-    username: string;
+    username: string | undefined;
     score?: number;
     profile_picture?: string;
     joined_at?: number;
@@ -37,7 +37,7 @@ interface Team {
 export interface RoomData {
     code: string;
     hostId: string;
-    players: Player[];
+    teams: Team[];
     status: "waiting" | "in_progress" | "ended";
     currentQuestion: number;
     created_at?: number;
@@ -45,47 +45,39 @@ export interface RoomData {
 
 type Role = "player" | "host";
 
-export default function Host() {
+export default function Room() {
     const [numberOfTossups, setNumberOfTossups] = useState<string>("20");
     const [readingSpeed, setReadingSpeed] = useState<string>("100")
     const [difficulty, setDifficulty] = useState<Difficulty | null>("Novice")
     const [diffMenuOpen, setDiffMenuOpen] = useState<boolean>(false);
-    const [roomCode, setRoomCode] = useState<number | null>(null);
+    const [roomCode, setRoomCode] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [chatMessage, setChatMessage] = useState<string>("");
     const [teamsOn, setTeamsOn] = useState<boolean>(false);
-    const [teamOne, setTeamOne] = useState<Team>({
-        id: 1,
-        name: "",
-        players: []
-    })
-    const [teamTwo, setTeamTwo] = useState<Team>({
-        id: 2,
-        name: "",
-        players: []
-    })
-    const [teamThree, setTeamThree] = useState<Team>({
-        id: 3,
-        name: "",
-        players: []
-    })
+    const [loading, setLoading] = useState<boolean>(false);
+    const [teams, setTeams] = useState<Team[]>([
+        { id: 1, name: "Team 1", players: [] },
+        { id: 2, name: "Team 2", players: [] },
+        { id: 3, name: "Team 3", players: [] },
+    ]);
 
     const navigate = useNavigate();
     const location = useLocation();
     const state = location.state;
 
-    const role: Role = state.role;
+    const role: Role = state?.role;
 
     const { socket, connected } = useSocket();
+    const { user } = useAuthentication();
 
     useEffect(() => {
         if (!role) {
-            console.log("Player has not joined the room.");
+            console.log("Player does not have a role.");
             navigate("/");
         }
-    }, [role, navigate])
+    }, [role, navigate, state])
 
-    useEffect(() => {   ``
+    useEffect(() => {
         const chatBox = document.querySelector("#chat-box");
 
         if (!chatBox) return;
@@ -96,39 +88,55 @@ export default function Host() {
     useEffect(() => {
         if (!socket || !connected) return;
 
-        if (role === "host") {
-            socket.emit("create-room", (response: any) => {
+        if (!sessionStorage.getItem("roomcode")) {
+            socket.emit("create-room", user, (response: any) => {
                 if (response.success) {
-                    const player = {
-                        id: socket.id,
-                        username: response.username
-                    }
-
                     setRoomCode(response.code);
-                    setTeamOne((prev) => ({ ...prev, players: [...prev.players, player] }))
+                    setTeams(response.teams);
+                    sessionStorage.setItem("roomcode", response.code);
                 };
             });
-        }
+        } else {
+            setLoading(true);
+            setRoomCode(sessionStorage.getItem("roomcode"));
 
+            (async () => {
+                try {
+                    const response = await axios.get(`/room/status/${roomCode}`);
+
+                    if (response.data.success && response.data.room) {
+                        setTeams(response.data.room.teams);
+                    }
+                } catch (err: any) {
+                    console.log(err);
+                } finally {
+                    setLoading(false);
+                }
+            })()
+        }
+    }, [socket, connected])
+
+    useEffect(() => {
         socket.on("chat-message", (message: Message) => {
             setMessages((prev) => [...prev, message]);
         })
 
-        socket.on("join-room", (data: {room: RoomData, code: number}) => {
-            if (role !== "player"){
+        socket.on("join-room", (data: { room: RoomData, player: Player }) => {
+            if (role !== "host" && role !== "player") {
                 return;
             }
 
-            setRoomCode(data.code);
-
-            
+            setTeams(data.room.teams);
+            sessionStorage.setItem("roomcode", data.room.code);
         })
 
         return () => {
             socket.off("chat-message");
             socket.off("create-room");
+            socket.off("join-room");
+            socket.emit("leave-room");
         }
-    }, [socket, connected])
+    }, [])
 
     const handleMessage = () => {
         if (!socket || !connected) return;
@@ -145,25 +153,27 @@ export default function Host() {
         <div className="h-screen flex justify-between">
             <div className="container space-y-20 p-2 max-w-4xl">
                 <div>
-                    <div className="flex flex-row gap-x-2 min-h-60">
-                        <PlayerList>
-                            {teamOne.players.map((player: Player) => (
-                                <PlayerCard username={player.username} key={player.id} />
-                            )
-                            )}
-                        </PlayerList>
-                        <PlayerList>
-                            {teamTwo.players.map((player: Player) => (
-                                <PlayerCard username={player.username} key={player.id} />
-                            )
-                            )}
-                        </PlayerList>
-                        <PlayerList>
-                            {teamThree.players.map((player: Player) => (
-                                <PlayerCard username={player.username} key={player.id} />
-                            )
-                            )}
-                        </PlayerList>
+                    <div className="grid grid-cols-3 gap-x-8 pt-2">
+                        <h2 className="text-center font-semibold pb-2 text-lg">{teams[0].name}</h2>
+                        <h2 className="text-center font-semibold pb-2 text-lg">{teams[1].name}</h2>
+                        <h2 className="text-center font-semibold pb-2 text-lg">{teams[2].name}</h2>
+                    </div>
+                    <div className="container grid gap-x-8 grid-cols-3 min-h-46">
+                        <div className="flex flex-col space-y-3 p-1">
+                            {teams[0].players.map((player: Player) => (
+                                <PlayerCard username={player.username} key={player.socket_id} />
+                            ))}
+                        </div>
+                        <div className="flex flex-col space-y-3 p-1">
+                            {teams[1].players.map((player: Player) => (
+                                <PlayerCard username={player.username} key={player.socket_id} />
+                            ))}
+                        </div>
+                        <div className="flex flex-col space-y-3 p-1">
+                            {teams[2].players.map((player: Player) => (
+                                <PlayerCard username={player.username} key={player.socket_id} />
+                            ))}
+                        </div>
                     </div>
                 </div>
                 {/* Chat */}
