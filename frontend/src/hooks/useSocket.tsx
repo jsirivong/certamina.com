@@ -1,28 +1,23 @@
 import { useState, useEffect } from "react";
-import { io, type Socket } from "socket.io-client";
 import socket from "../services/socket";
 
 export default function useSocket() {
-    const [connected, setConnected] = useState<boolean>(false);
+    const [connected, setConnected] = useState<boolean>(socket.connected);
 
     useEffect(() => {
-        socket?.connect();
+        const onConnect = () => setConnected(true);
+        const onDisconnect = () => setConnected(false);
 
-        if (socket.connected){
-            setConnected(true);
+        socket?.on("connect", onConnect);
+        socket?.on("disconnect", onDisconnect)
+
+        if (!socket.connected) {
+            socket.connect();
         }
-        
-        socket?.on("connect", () => {
-            setConnected(true);
-        })
-
-        socket?.on("disconnect", () => {
-            setConnected(false);
-        })
 
         return () => {
-            socket?.off("connect");
-            socket?.off("disconnect");
+            socket?.off("connect", onConnect);
+            socket?.off("disconnect", onDisconnect);
         }
     }, []);
 
