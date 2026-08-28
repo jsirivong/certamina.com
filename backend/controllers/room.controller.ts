@@ -64,6 +64,7 @@ export const checkIfRoomExists = async (req: Request, res: Response) => {
 
 export const createRoom = async (socket: Socket, user: { email: string, username: string }, callback: Function) => {
     try {
+        socket.data.username = user.username;
         const generatedCode = generateCode();
 
         const host: Player = {
@@ -73,6 +74,8 @@ export const createRoom = async (socket: Socket, user: { email: string, username
             score: 0,
             joined_at: Date.now()
         }
+
+        socket.data.roomcode = generatedCode;
 
         const roomData: RoomData = {
             code: generatedCode,
@@ -100,7 +103,8 @@ export const createRoom = async (socket: Socket, user: { email: string, username
 export const joinRoom = async (socket: Socket, io: Server, data: { code: string, username: string }, callback: Function) => {
     try {
         socket.join(`room:${data.code}`);
-        socket.data.roomCode = data.code;
+        socket.data.roomcode = data.code;
+        socket.data.username = data.username;
 
         const roomJSON = await redis.get(`room:${data.code}`);
 
@@ -160,6 +164,7 @@ export const deleteRoom = async (socket: Socket, data: { code: string }) => {
 
 export const leaveRoom = async (socket: Socket, io: Server, roomCode: string) => {
     try {
+        console.log("room code: " + roomCode);
         if (!roomCode) {
             return console.error("Room code was not passed in.");
         }
@@ -174,7 +179,7 @@ export const leaveRoom = async (socket: Socket, io: Server, roomCode: string) =>
 
         if (roomData) {
             roomData.teams.forEach((team: Team) => {
-                const updatedPlayers = team.players.filter((player: Player) => player.socket_id !== socket.id);
+                const updatedPlayers = team.players.filter((player: Player) => player.username !== socket.data.username);
                 team.players = updatedPlayers;
             })
 

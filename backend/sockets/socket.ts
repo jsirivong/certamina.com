@@ -5,10 +5,10 @@ import redis from '../services/redis.ts';
 import type { RoomData, Player, Team } from '../controllers/room.controller.ts';
 
 export const initializeSocketIOServer = (io: Server) => {
+    let timeoutLookups = new Map<string, NodeJS.Timeout>();
     // when a new socket connects
     io.on("connection", (socket: Socket) => {
-        console.log("New Websocket connected.");
-
+        console.log("new websocket connected");
         socket.on("create-room", (user, callback) => {
             createRoom(socket, user, callback);
         })
@@ -25,6 +25,19 @@ export const initializeSocketIOServer = (io: Server) => {
             leaveRoom(socket, io, roomCode)
         })
 
+        socket.on("rejoin-room", async (username: string, roomCode: string) => {
+            console.log("Username: " + username);
+            if (timeoutLookups.has(username)) {
+                clearTimeout(timeoutLookups.get(username)!);
+                timeoutLookups.delete(username);
+            }
+
+            console.log("Here is the lookups: " + timeoutLookups);
+            socket.join(`room:${roomCode}`);
+            socket.data.roomcode = roomCode;
+            socket.data.username = username;
+        })
+
         socket.on("chat-message", async (data) => {
             const roomJSON = await redis.get(`room:${data.roomCode}`)
 
@@ -39,7 +52,7 @@ export const initializeSocketIOServer = (io: Server) => {
 
             roomData.teams.forEach((team: Team) => {
                 team.players.forEach((player: Player) => {
-                    if (socket.id === player.socket_id){
+                    if (socket.data.username === player.username) {
                         messenger = player;
                     }
                 })
@@ -48,7 +61,7 @@ export const initializeSocketIOServer = (io: Server) => {
             if (!messenger) return console.error("Couldn't find player messenger.");
 
             const message = {
-                id: socket.id,
+                id: socket.id + Date.now(),
                 text: data.chatMessage,
                 username: messenger.username,
                 created_at: Date.now(),
@@ -59,8 +72,14 @@ export const initializeSocketIOServer = (io: Server) => {
         })
 
         socket.on("disconnect", async () => {
-            console.log(`Websocket '${socket.id}' disconnected.`);
-            leaveRoom(socket, io, socket.data.roomCode);
+            if (!socket.data.username) return;
+
+            const timeout = setTimeout(() => {
+                leaveRoom(socket, io, socket.data.roomcode);
+                timeoutLookups.delete(socket.data.username);
+            }, 10000)
+
+            timeoutLookups.set(socket.data.username, timeout);
 
             // try {
             //     const keys = await redis.keys(`room:*`);

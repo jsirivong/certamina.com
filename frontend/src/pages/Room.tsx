@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Send } from "lucide-react";
 import PlayerCard from "../components/PlayerCard";
 import axios from "../services/axios";
@@ -71,10 +71,42 @@ export default function Room() {
     const { user } = useAuthentication();
 
     useEffect(() => {
-        if (!role) {
-            return;
+        const emitRejoin = () => {
+            const username = sessionStorage.getItem("username");
+            const roomcode = sessionStorage.getItem("roomcode");
+
+            if (username && roomcode) {
+                socket.emit("rejoin-room", username, roomcode);
+            }
         }
 
+        socket.on("connect", emitRejoin);
+
+        socket.on("chat-message", (message: Message) => {
+            setMessages((prev) => [...prev, message]);
+        })
+
+        socket.on("join-room", (data: { room: RoomData, player: Player }) => {
+            if (role !== "host" && role !== "player") {
+                return navigate("/");
+            }
+
+            setTeams(data.room.teams);
+        })
+
+        socket.on("leave-room", (room: RoomData) => {
+            setTeams(room.teams);
+        })
+
+        return () => {
+            socket.off("chat-message");
+            socket.off("join-room");
+            socket.off("connect", emitRejoin);
+            socket.off("leave-room");
+        }
+    }, [])
+
+    useEffect(() => {
         if (role === "player") {
             setTeams(state?.room.teams);
             setRoomCode(state?.room.code);
@@ -91,6 +123,7 @@ export default function Room() {
 
     useEffect(() => {
         if (!socket || !connected) return;
+        if (role !== "host") return;
 
         if (!sessionStorage.getItem("roomcode")) {
             socket.emit("create-room", user, (response: any) => {
@@ -98,6 +131,7 @@ export default function Room() {
                     setRoomCode(response.code);
                     setTeams(response.teams);
                     sessionStorage.setItem("roomcode", response.code);
+                    sessionStorage.setItem("username", user?.username as string);
                 };
             });
         } else {
@@ -106,7 +140,7 @@ export default function Room() {
 
             (async () => {
                 try {
-                    const response = await axios.get(`/room/status/${roomCode}`);
+                    const response = await axios.get(`/room/status/${sessionStorage.getItem("roomcode")}`);
 
                     if (response.data.success && response.data.room) {
                         let totalAmountOfPlayers: number = 0;
@@ -137,44 +171,11 @@ export default function Room() {
         }
     }, [socket, connected])
 
-    useEffect(() => {
-        socket.on("chat-message", (message: Message) => {
-            setMessages((prev) => [...prev, message]);
-        })
-
-        socket.on("join-room", (data: { room: RoomData, player: Player }) => {
-            if (role !== "host" && role !== "player") {
-                return;
-            }
-
-            setTeams(data.room.teams);
-            sessionStorage.setItem("roomcode", data.room.code);
-        })
-        
-        socket.on("connect", () => {
-            socket.emit("rejoin-room", sessionStorage.getItem("username"));
-        })
-
-        socket.on("leave-room", (room: RoomData) => {
-            setTeams(room.teams);
-        })
-
-        return () => {
-            socket.off("chat-message");
-            socket.off("create-room");
-            socket.off("join-room");
-        }
-    }, [])
-
     const handleMessage = () => {
         if (!socket || !connected) return;
 
         socket.emit("chat-message", { chatMessage, roomCode })
         setChatMessage("");
-    }
-
-    if (!connected || !socket) {
-        return <PageLoading />;
     }
 
     return (

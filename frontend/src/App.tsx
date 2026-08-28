@@ -13,7 +13,6 @@ import { useThemeStore } from "./store/useThemeStore.ts";
 import useAuthentication from "./hooks/useAuthentication.tsx";
 import Settings from "./pages/Settings.tsx";
 import Room from "./pages/Room.tsx";
-import EnterUsername from "./pages/EnterUsername.tsx";
 import { useState } from "react";
 
 export default function App() {
@@ -62,7 +61,6 @@ export default function App() {
         {/* <Route path="/donate" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Donate /></Footer></Navbar>} /> */}
         <Route path="/settings" element={!Boolean(user) ? <Navigate to={"/login"} /> : <Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Settings /></Footer></Navbar>} />
         <Route path="/room" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Room /></Footer></Navbar>} />
-        <Route path="/username" element={<Footer><EnterUsername /></Footer>} />
       </Routes>
     </div>
   )
