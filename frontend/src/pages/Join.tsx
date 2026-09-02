@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useThemeStore } from "../store/useThemeStore";
 import axios from "../services/axios.ts";
-import socket from "../services/socket.ts";
 
 export default function Join() {
     const { theme } = useThemeStore();
@@ -14,21 +13,20 @@ export default function Join() {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
-        
+
         try {
             setLoading(true);
             const response = await axios.get(`/room/status/${code}`);
 
-            if (response.data.room){
+            if (response.data.room) {
                 if (sessionStorage.getItem("roomcode")) return;
 
                 sessionStorage.setItem("username", "Player");
                 sessionStorage.setItem("roomcode", response.data.room.code);
 
-                navigate(`/room`, {state: {role: "player", room: response.data.room}})
-                socket.emit("join-room", { code: response.data.room.code, username: "Player" })
+                navigate(`/room`, { state: { role: "player", room: response.data.room } })
             }
-        } catch (e: any){
+        } catch (e: any) {
             console.error("Error joining room.", e);
             setError(e);
         } finally {
