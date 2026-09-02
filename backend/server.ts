@@ -50,8 +50,13 @@ const initializeUsersDatabase = async () => {
     }
 }
 
+interface SocketData {
+    roomcode: string;
+    username: string;
+}
+
 // socket.io server instance
-const io = new Server(server, { 
+const io = new Server<{}, {}, {}, SocketData>(server, { 
     cors: {
         origin: ["https://certamina.com", "http://localhost:5173"]
     }
