@@ -53,7 +53,6 @@ export default function Room() {
     const [roomCode, setRoomCode] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [chatMessage, setChatMessage] = useState<string>("");
-    const [teamsOn, setTeamsOn] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [teams, setTeams] = useState<Team[]>([
         { id: 1, name: "Team 1", players: [] },
@@ -61,7 +60,6 @@ export default function Room() {
         { id: 3, name: "Team 3", players: [] },
     ]);
 
-    const navigate = useNavigate();
     const location = useLocation();
     const state = location.state;
 
@@ -71,27 +69,25 @@ export default function Room() {
     const { user } = useAuthentication();
 
     useEffect(() => {
-        const emitRejoin = () => {
-            const username = sessionStorage.getItem("username");
-            const roomcode = sessionStorage.getItem("roomcode");
-
-            if (username && roomcode) {
-                socket.emit("rejoin-room", username, roomcode);
+        const onConnect = () => {
+            if (sessionStorage.getItem("roomcode") && sessionStorage.getItem("username")) {
+                socket.emit("rejoin-room", sessionStorage.getItem("roomcode"), sessionStorage.getItem("username"), (response: any) => {
+                    setTeams(response.data.room.teams);
+                    setRoomCode(response.data.room.code);
+                });
             }
         }
 
-        socket.on("connect", emitRejoin);
+        socket.on("connect", onConnect);
 
         socket.on("chat-message", (message: Message) => {
             setMessages((prev) => [...prev, message]);
         })
 
-        socket.on("join-room", (data: { room: RoomData, player: Player }) => {
-            if (role !== "host" && role !== "player") {
-                return navigate("/");
-            }
-
+        socket.on("join-room", (data: { room: RoomData }) => {
+            console.log("join room");
             setTeams(data.room.teams);
+            setRoomCode(data.room.code);
         })
 
         socket.on("leave-room", (room: RoomData) => {
@@ -101,17 +97,20 @@ export default function Room() {
         return () => {
             socket.off("chat-message");
             socket.off("join-room");
-            socket.off("connect", emitRejoin);
             socket.off("leave-room");
         }
     }, [])
 
     useEffect(() => {
         if (role === "player") {
-            setTeams(state?.room.teams);
-            setRoomCode(state?.room.code);
+            socket.emit("join-room", { code: sessionStorage.getItem("roomcode"), username: "Player" }, (response: any) => {
+                if (response.data.success) {
+                    setTeams(response.data.room.teams);
+                    setRoomCode(response.data.room.code);
+                }
+            })
         }
-    }, [role, navigate, state])
+    }, [role])
 
     useEffect(() => {
         const chatBox = document.querySelector("#chat-box");
