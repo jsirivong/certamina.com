@@ -144,7 +144,9 @@ export const joinRoom = async (socket: Socket, io: Server, data: { code: string,
 
         await redis.setex(`room:${data.code}`, 3600, JSON.stringify(roomData));
 
-        callback({ success: true, room: roomData, player })
+        if (typeof callback === "function"){
+            callback({ success: true, room: roomData, player });
+        }
     } catch (err: any) {
         console.log("Error in joining room.");
     }
