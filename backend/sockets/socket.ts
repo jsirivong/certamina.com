@@ -21,7 +21,7 @@ export const initializeSocketIOServer = (io: Server) => {
             joinRoom(socket, io, data, callback)
         })
 
-        socket.on("rejoin-room", async (code: string, username: string, callback: Function) => {
+        socket.on("rejoin-room", async (code: string, username: string) => {
             if (!code || !username) return;
 
             if (timeoutLookups.has(username)) {
