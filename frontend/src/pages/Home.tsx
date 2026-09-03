@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { useThemeStore } from "../store/useThemeStore"
 import { useUserStore } from "../store/useUserStore";
+import { MoveRight } from "lucide-react";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -9,37 +10,19 @@ export default function Home() {
 
     return (
         <div className="h-screen overflow-y-auto space-y-44" data-theme={theme}>
-            <div className="bg-purple-950 h-[70vh] lg:h-[80vh] flex items-center justify-center flex-col gap-y-28 p-7">
-                <div className="space-y-4">
-                    <h2 className="text-yellow-500 md:text-5xl text-3xl font-bold max-w-3xl text-center">The reader and host you never knew you needed.</h2>
-                    <p className="text-white text-xl font-semibold text-center underline underline-offset-7">- Certamina.com</p>
-                </div>
-                <div className="max-w-60 w-full flex sm:flex-row flex-col gap-y-5 justify-center items-center gap-x-10">
-                    <button className={`w-full btn bg-purple-950 rounded-xl border-yellow-500 border-[0.5px] text-lg tracking-wider text-white shadow-lg shadow-purple-900 hover:bg-purple-800 ${user && "hidden"}`} onClick={() => navigate("/register")}>Register</button>
-                    <button className="w-full btn bg-purple-950 rounded-xl border-yellow-500 border-[0.5px] text-lg tracking-wider text-white shadow-lg shadow-purple-900 hover:bg-purple-800" onClick={() => navigate("/join")}>Join a game</button>
-                </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-y-48 p-10">
-                <div className="grid grid-cols-2 bg-base-300 h-[70vh] p-20 w-full gap-x-20">
-                    <div className="max-w-[70vw] flex flex-col space-y-6 mx-auto justify-center">
-                        <h2 className="font-bold text-3xl lg:text-5xl text-purple-600">Set up a game in seconds</h2>
-                        <p className="text-md font-semibold">Host a competitive, real-like game of Certamen in just a few seconds with a maximum of 12 people.</p>
-                        <button className="btn btn-soft w-full" onClick={() => navigate("/room")}>Host {">"}</button>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 bg-base-300 h-[70vh] p-20 w-full gap-x-20">
-                    <div>
-
-                    </div>
-                    <div className="max-w-[70vw] flex flex-col space-y-6 mx-auto justify-center">
-                        <h2 className="font-bold text-3xl lg:text-5xl text-purple-600">Practice anywhere, everywhere, nonstop</h2>
-                        <p className="text-md font-semibold">Doesn't matter where you are, Certamina sets you up in a simulated game of Certamen as many times as you want.</p>
-                        <button className="btn btn-soft w-full" onClick={() => navigate("/practice")}>Practice {">"}</button>
+            <div className="bg-base-100 h-[70vh] lg:h-[80vh] gap-y-28">
+                <div className="bg-base-200 w-2xl h-[88vh] flex items-center">
+                    <div className="w-full p-10 space-y-7">
+                        <h1 className="font-light text-5xl text-left">Host exciting Certamen games in seconds<span className="animate-pulse font-thin">|</span></h1>
+                        <p className="font-extralight">From just a few clicks, you can host and join a room anywhere in the world—whether from your house or at the other side of the world.</p>
+                        <div className="w-full flex flex-row items-center space-x-10 container">
+                            <button className="p-2 w-50 flex flex-row items-center justify-around bg-base-content/5 font-extralight rounded-sm hover:cursor-pointer hover:bg-base-100 hover:border-[0.25px] hover:border-purple-500">Host<MoveRight size={14}/></button>
+                            <button className="border-[0.5px] p-2 w-50 flex flex-row items-center justify-around bg-base-content/5 rounded-sm font-extralight hover:bg-base-200 hover:cursor-pointer hover:border-yellow-200" onClick={() => navigate("/join")}>Join a Room<MoveRight size={14}/></button>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }
