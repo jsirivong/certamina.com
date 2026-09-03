@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Send } from "lucide-react";
 import PlayerCard from "../components/PlayerCard";
 import axios from "../services/axios";
 import { useNavigate } from "react-router";
-import PageLoading from "../components/PageLoading";
 import useSocket from "../hooks/useSocket";
 import { useLocation } from "react-router";
 import useAuthentication from "../hooks/useAuthentication";
+import { ArrowLeftToLine } from "lucide-react";
 
 type Difficulty = "Novice" | "Intermediate" | "Advanced";
 
@@ -60,6 +60,7 @@ export default function Room() {
         { id: 3, name: "Team 3", players: [] },
     ]);
 
+    const navigate = useNavigate();
     const location = useLocation();
     const state = location.state;
 
@@ -85,7 +86,6 @@ export default function Room() {
         })
 
         socket.on("join-room", (data: { room: RoomData }) => {
-            console.log("join room");
             setTeams(data.room.teams);
             setRoomCode(data.room.code);
         })
@@ -119,6 +119,17 @@ export default function Room() {
 
         chatBox.scrollTop = chatBox.scrollHeight;
     }, [messages])
+
+    const handleLeaveRoom = () => {
+        if (!roomCode) return;
+
+        socket.emit("leave-room", roomCode);
+
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("roomcode");
+
+        navigate("/join")
+    }
 
     useEffect(() => {
         if (!socket || !connected) return;
@@ -233,9 +244,14 @@ export default function Room() {
             </div>
             {/* Menu */}
             <div className="h-11/12 bg-base-200 m-2 max-w-3xl border-[0.5px] border-base-content/10 rounded-xl">
+                <div className="pl-5 pt-3 w-full flex flex-row space-x-1 items-center">
+                    <ArrowLeftToLine size={20}/>
+                    <button className="text-lg text-center hover:cursor-pointer" onClick={handleLeaveRoom}>Leave</button>
+                </div>
+                
                 <div className="flex flex-row gap-x-20 items-center justify-center m-4">
-                    <button className="border-b-[1.5px] border-b-base-content/30 cursor-pointer text-xl tracking-wider">Settings</button>
-                    <button className="border-b-[1.5px] border-b-base-content/30 cursor-pointer text-xl tracking-wider">Characters</button>
+                    <button className="border-b-[1.5px] border-b-base-content/5 cursor-pointer text-xl tracking-wider">Settings</button>
+                    <button className="border-b-[1.5px] border-b-base-content/5 cursor-pointer text-xl tracking-wider">Characters</button>
                 </div>
                 <h2 className="text-center m-5 mb-20 text-4xl"><span className="tracking-wider">Code</span>: <span className="tracking-widest">{roomCode}</span></h2>
 
