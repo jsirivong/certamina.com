@@ -57,9 +57,7 @@ export default function App() {
         <Route path="/register" element={!Boolean(user) || user?.username === undefined || user?.email === undefined ? (<Footer><Register /></Footer>) : <Navigate to={"/"} />} />
         <Route path="/login" element={!Boolean(user) || user?.username === undefined || user?.email === undefined ? <Footer><Login /></Footer> : <Navigate to={"/"} />} />
         <Route path="/join" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Join /></Navbar>} />
-        <Route path="/practice" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Practice /></Navbar>} />
-        {/* <Route path="/donate" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Donate /></Footer></Navbar>} /> */}
-        <Route path="/settings" element={!Boolean(user) ? <Navigate to={"/login"} /> : <Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Settings /></Footer></Navbar>} />
+        <Route path="/practice" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Practice /></Navbar>} />        <Route path="/settings" element={!Boolean(user) ? <Navigate to={"/login"} /> : <Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Settings /></Footer></Navbar>} />
         <Route path="/room" element={<Navbar username={user?.username} isAuthenticated={Boolean(user)} handleLogout={handleLogout} loading={loading}><Footer><Room /></Footer></Navbar>} />
       </Routes>
     </div>
