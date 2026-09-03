@@ -23,7 +23,7 @@ export default function Navbar({ isAuthenticated, children, username, handleLogo
                 <div className="p-3 flex-none">
                     <Link to={"/"} className="flex flex-row items-center gap-x-4">
                         <img className="md:size-11 size-9" src="/certaminaicon.png" alt="Certamina Home Icon" />
-                        <h1 className="md:text-2xl text-xl font-semibold tracking-wider">Certamina</h1>
+                        <h1 className="md:text-2xl text-xl font-semibold tracking-tighter">Certamina</h1>
                     </Link>
                 </div>
                 <div className="container">
